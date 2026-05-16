@@ -128,7 +128,7 @@
     const statusElement = document.getElementById('status');
 
     // Supported music file extensions
-    const supportedExtensions = ['.mp3', '.wav', '.ogg', '.m4a'];
+    const supportedExtensions = ['.mp3', '.wav', '.ogg', '.m4a', 'mp4'];
 
     async function fetchMusicFiles() {
         const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FOLDER_PATH}`;
