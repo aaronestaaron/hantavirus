@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hantavirus</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .player-container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #1db954; /* Music player accent color */
+        }
+
+        .now-playing {
+            text-align: center;
+            font-size: 0.9em;
+            color: #b3b3b3;
+            margin-bottom: 15px;
+            height: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        audio {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .playlist-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .playlist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        /* Custom Scrollbar for playlist */
+        .playlist::-webkit-scrollbar {
+            width: 6px;
+        }
+        .playlist::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 3px;
+        }
+
+        .playlist li {
+            padding: 10px 15px;
+            background-color: #282828;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 0.95em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playlist li:hover {
+            background-color: #3e3e3e;
+        }
+
+        .playlist li.active {
+            background-color: #1db954;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .status-msg {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="player-container">
+    <h2>HANTABIRUSSSS</h2>
+    <div class="now-playing" id="now-playing">Selecting song...</div>
+    
+    <audio id="audio-player" controls></audio>
+
+    <div class="playlist-title">Playlist</div>
+    <div id="status" class="status-msg">Fetching data from GitHub...</div>
+    <ul class="playlist" id="playlist"></ul>
+</div>
+
+<script>
+    // ================= YOUR GITHUB CONFIGURATION =================
+    const GITHUB_USER = 'aaronestaaron'; 
+    const GITHUB_REPO = 'hantavirus';
+    const FOLDER_PATH = ''; // Leave empty '' if music files are in the repository root
+    // =============================================================
+
+    const audioPlayer = document.getElementById('audio-player');
+    const playlistElement = document.getElementById('playlist');
+    const nowPlayingElement = document.getElementById('now-playing');
+    const statusElement = document.getElementById('status');
+
+    // Supported music file extensions
+    const supportedExtensions = ['.mp3', '.wav', '.ogg', '.m4a'];
+
+    async function fetchMusicFiles() {
+        const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FOLDER_PATH}`;
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to fetch data. Check your username/repository.');
+            
+            const files = await response.json();
+            
+            // Filter only files with music extensions
+            const musicFiles = files.filter(file => {
+                if (file.type !== 'file') return false;
+                const fileNameLower = file.name.toLowerCase();
+                return supportedExtensions.some(ext => fileNameLower.endsWith(ext));
+            });
+
+            if (musicFiles.length === 0) {
+                statusElement.innerText = "No music files found.";
+                return;
+            }
+
+            statusElement.style.display = 'none'; // Hide loading status
+            renderPlaylist(musicFiles);
+
+        } catch (error) {
+            statusElement.innerText = "Error: " + error.message;
+            console.error(error);
+        }
+    }
+
+    function renderPlaylist(songs) {
+        songs.forEach((song, index) => {
+            const li = document.createElement('li');
+            // Remove file extension for cleaner look
+            const songTitle = song.name.replace(/\.[^/.]+$/, ""); 
+            li.innerText = `${index + 1}. ${songTitle}`;
+            
+            // Set click event to play song
+            li.addEventListener('click', () => {
+                playSong(song.download_url, songTitle, li);
+            });
+
+            playlistElement.appendChild(li);
+        });
+
+        // Automatically load the first song (optional)
+        if(songs.length > 0) {
+            const firstLi = playlistElement.querySelector('li');
+            const firstTitle = songs[0].name.replace(/\.[^/.]+$/, "");
+            playSong(songs[0].download_url, firstTitle, firstLi);
+            audioPlayer.pause(); // Pause initial autoplay to comply with browser policies
+        }
+    }
+
+    function playSong(url, title, element) {
+        // Remove 'active' class from previous song
+        const currentActive = playlistElement.querySelector('.active');
+        if (currentActive) currentActive.classList.remove('active');
+
+        // Highlight currently playing song
+        element.classList.add('active');
+        
+        // Change audio source and play
+        audioPlayer.src = url;
+        nowPlayingElement.innerText = "Now playing: " + title;
+        audioPlayer.play().catch(error => {
+            console.log("Autoplay prevented by browser, waiting for user interaction.");
+        });
+    }
+
+    // Run function on page load
+    fetchMusicFiles();
+</script>
+
+</body>
+</html>
