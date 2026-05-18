@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta property="og:title" content="hantavirus." />
-<meta property="og:description" content="music playlist. no ads, downloadable" />
-<meta property="og:image" content="https://aaronestaaron.github.io/hantavirus/ico.jpg" />
-<meta property="og:url" content="https://aaronestaaron.github.io/hantavirus" />
-<meta property="og:type" content="playlist" />
-</head>
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hantavirus.</title>
-	<link rel="icon" type="image/png" href="ico.jpg">
-	
+    <link rel="icon" type="image/png" href="https://aaronestaaron.github.io/hantavirus/ico.jpg">
+	<meta property="og:title" content="hantavirus." />
+	<meta property="og:description" content="music playlist. no ads, downloadable" />
+	<meta property="og:image" content="https://aaronestaaron.github.io/hantavirus/ico.jpg" />
+	<meta property="og:url" content="https://aaronestaaron.github.io/hantavirus" />
+	<meta property="og:type" content="playlist" />
     <style>
-        /* === def vars for every theme === */
+        /* === def vars === */
         
-        /* 1. light-blue (default) */
+        /* light-blue */
         body.theme-light-blue {
             --bg-body: #e0f7fa;
             --bg-player: #ffffff;
@@ -30,11 +27,11 @@
             --btn-bg: #f5f5f5;
             --btn-text: #546e7a;
             --btn-border: #e0e0e0;
-			--audio-scheme: light;
-            --audio-bg: #f1f1f1;
+            --audio-scheme: light;
+            --audio-bg: #f1f1f1; 
         }
 
-        /* 2. green-dark */
+        /* green-dark */
         body.theme-green-dark {
             --bg-body: #0c100d;
             --bg-player: #141a16;
@@ -48,11 +45,11 @@
             --btn-bg: #1c241e;
             --btn-text: #8ea895;
             --btn-border: #253329;
-			--audio-scheme: dark;
-            --audio-bg: #0b0f0c;
+            --audio-scheme: dark;
+            --audio-bg: #0b0f0c; 
         }
 
-        /* 3. red-dark */
+        /* red-dark */
         body.theme-red-dark {
             --bg-body: #120a0a;
             --bg-player: #1c1010;
@@ -66,11 +63,29 @@
             --btn-bg: #291717;
             --btn-text: #b89393;
             --btn-border: #3b2020;
-			--audio-scheme: dark;
-            --audio-bg: #0f0808;
+            --audio-scheme: dark;
+            --audio-bg: #0f0808; 
         }
 
-        /* === main styling (with var ofc) === */
+        /* pink-dark */
+        body.theme-pink-dark {
+            --bg-body: #120a0f; 
+            --bg-player: #1c1017; 
+            --bg-item: #291722; 
+            --bg-item-hover: #3d2132; 
+            --text-main: #fce4ec; 
+            --text-sub: #c29ba9; 
+            --accent: #e91e63; 
+            --shadow: 0 8px 24px rgba(233, 30, 99, 0.25); 
+            --border: #3d2132;
+            --btn-bg: #291722;
+            --btn-text: #c29ba9;
+            --btn-border: #3d2132;
+            --audio-scheme: dark;
+            --audio-bg: #10080d; 
+        }
+
+        /* main styling */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-body);
@@ -95,7 +110,6 @@
             position: relative;
         }
 
-        /* dropdown position  */
         .theme-selector-container {
             display: flex;
             justify-content: flex-end;
@@ -143,12 +157,12 @@
         audio {
             width: 100%;
             margin-bottom: 15px;
-			color-scheme: var(--audio-scheme); /* change internal theme (auto) */
+            color-scheme: var(--audio-scheme);
             transition: all 0.3s ease;
         }
-		
-		audio::-webkit-media-controls-panel {
-            background-color: var(--audio-bg); /* backgrond panel change */
+
+        audio::-webkit-media-controls-panel {
+            background-color: var(--audio-bg);
             transition: background-color 0.3s ease;
         }
 
@@ -297,18 +311,19 @@
             <option value="theme-light-blue">blu</option>
             <option value="theme-green-dark">geren but black</option>
             <option value="theme-red-dark">red but blakc</option>
+            <option value="theme-pink-dark">hello kitty hello</option>
         </select>
     </div>
 
     <h2>HANTABIRUSSSS</h2>
-    <div class="now-playing" id="now-playing">selecting song...</div>
+    <div class="now-playing" id="now-playing">searchign song...</div>
     <div class="now-playing-artist" id="now-playing-artist"></div>
     
     <audio id="audio-player" controls></audio>
 
     <div class="controls-container">
         <button id="shuffle-btn" class="control-btn">shuffle</button>
-        <button id="repeat-btn" class="control-btn">repeat: off</button>
+        <button id="repeat-btn" class="control-btn">repeat: no</button>
         <button id="wake-lock-btn" class="control-btn">keep awake: off</button>
     </div>
 
@@ -317,12 +332,12 @@
         <span>Artist</span>
     </div>
     
-    <div id="status" class="status-msg">fetching data from GitHub...</div>
+    <div id="status" class="status-msg">fetching data from github...</div>
     <ul class="playlist" id="playlist"></ul>
 </div>
 
 <script>
-    // ================= config =================
+    // ================= github config =================
     const GITHUB_USER = 'aaronestaaron'; 
     const GITHUB_REPO = 'hantavirus';
     const FOLDER_PATH = ''; 
@@ -348,7 +363,6 @@
     let wakeLockSentinel = null;
     let isKeepAwakeEnabled = false;
 
-    // ================= logic =================
     function initTheme() {
         const savedTheme = localStorage.getItem('user-theme') || 'theme-light-blue';
         document.body.className = savedTheme;
@@ -358,12 +372,10 @@
     themeSelect.addEventListener('change', (e) => {
         const selectedTheme = e.target.value;
         document.body.className = selectedTheme;
-        localStorage.setItem('user-theme', selectedTheme); // saves
+        localStorage.setItem('user-theme', selectedTheme);
     });
     
-    // run initialization
     initTheme();
-    // =========================================================
 
     async function fetchMusicFiles() {
         const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FOLDER_PATH}`;
@@ -395,9 +407,10 @@
         }
     }
 
+    // filename system " - "
     function parseSongData(filename) {
         const songNameClean = filename.replace(/\.[^/.]+$/, ""); 
-        let artist = "Unknown Artist";
+        let artist = "unknown artist";
         let title = songNameClean;
 
         if (songNameClean.includes(" - ")) {
@@ -474,7 +487,7 @@
                 currentTrackIndex = 0;
                 playTrack(currentTrackIndex);
             } else {
-                nowPlayingElement.innerText = "Playlist finished.";
+                nowPlayingElement.innerText = "playlist finished.";
                 nowPlayingArtistElement.innerText = "";
             }
         }
@@ -496,7 +509,7 @@
             repeatBtn.classList.add('active');
         } else {
             repeatMode = 'none';
-            repeatBtn.innerHTML = 'repeat: off';
+            repeatBtn.innerHTML = 'repeat: no';
             repeatBtn.classList.remove('active');
         }
     });
