@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hantavirus.</title>
     <link rel="icon" type="image/png" href="https://aaronestaaron.github.io/hantavirus/ico.jpg">
-    <meta property="og:title" content="hantavirus." />
+    <meta property="og:title" content="hantavirus. - New-Exp" />
     <meta property="og:description" content="haha yes playlist/" />
     <meta property="og:image" content="https://aaronestaaron.github.io/hantavirus/ico.jpg" />
-    <meta property="og:url" content="https://hantavirus.on.top" />
+    <meta property="og:url" content="https://aaronestaaron.on.top" />
     <meta property="og:type" content="playlist" />
     <style>
         /* === def vars === */
@@ -31,6 +31,8 @@
             --audio-scheme: light;
             --audio-bg: #f1f1f1;
             --viz-bg: rgba(227, 242, 252, 0.55);
+            --track-bg: rgba(3, 169, 244, 0.14);
+            --buffer-bg: rgba(3, 169, 244, 0.22);
         }
 
         /* green-dark */
@@ -51,6 +53,8 @@
             --audio-scheme: dark;
             --audio-bg: #0b0f0c;
             --viz-bg: rgba(20, 26, 22, 0.6);
+            --track-bg: rgba(255, 255, 255, 0.08);
+            --buffer-bg: rgba(29, 185, 84, 0.28);
         }
 
         /* red-dark */
@@ -71,6 +75,8 @@
             --audio-scheme: dark;
             --audio-bg: #0f0808;
             --viz-bg: rgba(28, 16, 16, 0.6);
+            --track-bg: rgba(255, 255, 255, 0.07);
+            --buffer-bg: rgba(229, 57, 53, 0.28);
         }
 
         /* pink-dark */
@@ -91,6 +97,30 @@
             --audio-scheme: dark;
             --audio-bg: #10080d;
             --viz-bg: rgba(28, 16, 23, 0.6);
+            --track-bg: rgba(255, 255, 255, 0.07);
+            --buffer-bg: rgba(233, 30, 99, 0.3);
+        }
+
+        /* orange-dark */
+        body.theme-orange-dark {
+            --bg-body: #120e08;
+            --bg-player: #1c1610;
+            --bg-item: #2a2018;
+            --bg-item-hover: #3a2c1e;
+            --text-main: #f5e6d3;
+            --text-sub: #c9a87c;
+            --accent: #ff8c00;
+            --accent-rgb: 255, 140, 0;
+            --shadow: 0 20px 60px rgba(255, 140, 0, 0.25);
+            --border: #3a2c1e;
+            --btn-bg: #2a2018;
+            --btn-text: #c9a87c;
+            --btn-border: #3a2c1e;
+            --audio-scheme: dark;
+            --audio-bg: #0f0a05;
+            --viz-bg: rgba(28, 22, 16, 0.6);
+            --track-bg: rgba(255, 255, 255, 0.08);
+            --buffer-bg: rgba(255, 140, 0, 0.3);
         }
 
         * { box-sizing: border-box; }
@@ -151,14 +181,8 @@
             letter-spacing: 0;
         }
 
-        .theme-select:hover {
-            border-color: var(--accent);
-        }
-
-        .theme-select:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-        }
+        .theme-select:hover { border-color: var(--accent); }
+        .theme-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
         h2 {
             text-align: center;
@@ -175,7 +199,7 @@
             background: var(--viz-bg);
             border-radius: 18px;
             padding: 10px;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             overflow: hidden;
             border: 1px solid var(--border);
             transition: background 0.4s ease, border-color 0.4s ease;
@@ -213,23 +237,215 @@
             text-align: center;
             font-size: 0.9em;
             color: var(--text-sub);
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             height: 18px;
             font-weight: 500;
         }
 
-        audio {
-            width: 100%;
-            margin-bottom: 16px;
-            color-scheme: var(--audio-scheme);
-            transition: all 0.3s ease;
-            border-radius: 12px;
+        /* hidden native audio (driven by custom UI) */
+        audio.hidden-audio {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+            border: 0;
+            padding: 0;
         }
 
-        audio::-webkit-media-controls-panel {
-            background-color: var(--audio-bg);
-            transition: background-color 0.3s ease;
+        /* === custom audio player === */
+        .custom-player {
+            background: var(--bg-item);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            transition: background 0.4s ease, border-color 0.4s ease;
         }
+
+        .player-main-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 12px;
+        }
+
+        .ctrl-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease, transform 0.15s ease, background 0.2s ease;
+            padding: 0;
+            font-family: inherit;
+        }
+
+        .ctrl-btn:hover { color: var(--text-main); transform: scale(1.08); }
+        .ctrl-btn:active { transform: scale(0.96); }
+        .ctrl-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 50%; }
+        .ctrl-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+        .ctrl-btn-sm {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+        }
+
+        .ctrl-btn-main {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 8px 22px rgba(var(--accent-rgb), 0.4);
+        }
+        .ctrl-btn-main:hover { color: #fff; transform: scale(1.06); box-shadow: 0 10px 28px rgba(var(--accent-rgb), 0.5); }
+        .ctrl-btn-main:disabled { box-shadow: none; }
+
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .time-text {
+            font-size: 0.72em;
+            color: var(--text-sub);
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            min-width: 34px;
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+
+        .progress-track {
+            position: relative;
+            flex: 1;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        .progress-track-rail {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--track-bg);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-buffered {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: var(--buffer-bg);
+            border-radius: 999px;
+            transition: width 0.2s linear;
+        }
+
+        .progress-filled {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 999px;
+            transition: width 0.08s linear;
+        }
+
+        .progress-thumb {
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--accent);
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.18s ease;
+            box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.4);
+            pointer-events: none;
+            left: 0%;
+        }
+
+        .progress-track:hover .progress-thumb,
+        .progress-track.dragging .progress-thumb {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .volume-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ctrl-btn-xs {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: var(--text-sub);
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 5px;
+            background: var(--track-bg);
+            border-radius: 999px;
+            outline: none;
+            cursor: pointer;
+            max-width: 140px;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: none;
+            transition: box-shadow 0.2s ease, transform 0.15s ease;
+            box-shadow: 0 2px 6px rgba(var(--accent-rgb), 0.35);
+        }
+        .volume-slider::-webkit-slider-thumb:hover { box-shadow: 0 0 0 7px rgba(var(--accent-rgb), 0.15); }
+        .volume-slider::-moz-range-thumb {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(var(--accent-rgb), 0.35);
+        }
+        .volume-slider::-moz-range-track {
+            height: 5px;
+            background: var(--track-bg);
+            border-radius: 999px;
+        }
+        .volume-slider:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 999px; }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2.5px solid rgba(255,255,255,0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .controls-container {
             display: flex;
@@ -261,15 +477,8 @@
             border-color: var(--accent);
             transform: translateY(-1px);
         }
-
-        .control-btn:active {
-            transform: translateY(0);
-        }
-
-        .control-btn:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-        }
+        .control-btn:active { transform: translateY(0); }
+        .control-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
         .control-btn.active {
             background-color: var(--accent);
@@ -311,19 +520,10 @@
             overflow-y: auto;
         }
 
-        .playlist::-webkit-scrollbar {
-            width: 6px;
-        }
-        .playlist::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .playlist::-webkit-scrollbar-thumb {
-            background-color: var(--border);
-            border-radius: 3px;
-        }
-        .playlist::-webkit-scrollbar-thumb:hover {
-            background-color: var(--accent);
-        }
+        .playlist::-webkit-scrollbar { width: 6px; }
+        .playlist::-webkit-scrollbar-track { background: transparent; }
+        .playlist::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 3px; }
+        .playlist::-webkit-scrollbar-thumb:hover { background-color: var(--accent); }
 
         .playlist li {
             display: flex;
@@ -379,12 +579,43 @@
         .song-artist {
             font-size: 0.88em;
             color: var(--text-sub);
-            padding-left: 12px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 42%;
+            max-width: 130px;
         }
+
+        .song-row-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            min-width: 0;
+        }
+
+        .row-action-btn {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(128, 128, 128, 0.16);
+            color: var(--text-sub);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+            padding: 0;
+        }
+        .row-action-btn:hover { background: rgba(128, 128, 128, 0.3); color: var(--text-main); transform: scale(1.1); }
+        .row-action-btn:active { transform: scale(0.95); }
+        .row-action-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+        .row-action-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+        .row-action-btn:disabled:hover { background: rgba(128,128,128,0.16); color: var(--text-sub); transform: none; }
+        .row-action-btn.added { color: var(--accent); }
+        .playlist li.active .row-action-btn { background: rgba(255, 255, 255, 0.22); color: #fff; }
+        .playlist li.active .row-action-btn:hover { background: rgba(255, 255, 255, 0.4); color: #fff; }
 
         .playlist li.active .song-artist,
         .playlist li.active .song-title-wrapper span {
@@ -424,6 +655,69 @@
             50% { transform: scaleY(1); }
         }
 
+        .hidden { display: none !important; }
+
+        /* === playlist management: tabs + toolbar === */
+        .playlist-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+        .playlist-tab {
+            flex: 1;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            padding: 8px 10px;
+            color: var(--text-sub);
+            font-size: 0.72em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .playlist-tab:hover { color: var(--text-main); }
+        .playlist-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .playlist-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+        .playlist-toolbar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--btn-border);
+            padding: 5px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.7em;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover { color: var(--text-main); border-color: var(--accent); }
+        .action-btn:active { transform: translateY(1px); }
+        .action-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-sub);
+            font-style: italic;
+            font-size: 0.88em;
+            padding: 24px 12px;
+        }
+
         @media (max-width: 480px) {
             body { padding: 12px; }
             .player-container { padding: 20px; border-radius: 20px; }
@@ -431,7 +725,9 @@
             .now-playing { font-size: 1.05em; }
             .visualizer-wrap { padding: 8px; }
             #visualizer { height: 110px; }
-            .song-artist { max-width: 38%; }
+            .song-artist { max-width: 95px; }
+            .player-main-controls { gap: 14px; }
+            .ctrl-btn-main { width: 52px; height: 52px; }
         }
     </style>
 </head>
@@ -445,6 +741,7 @@
             <option value="theme-green-dark">geren but black</option>
             <option value="theme-red-dark">red but blakc</option>
             <option value="theme-pink-dark">hello kitty hello</option>
+            <option value="theme-orange-dark">orange juice dark</option>
         </select>
     </div>
 
@@ -457,7 +754,42 @@
     <div class="now-playing" id="now-playing">searchign song...</div>
     <div class="now-playing-artist" id="now-playing-artist"></div>
 
-    <audio id="audio-player" controls crossorigin="anonymous"></audio>
+    <audio id="audio-player" class="hidden-audio" crossorigin="anonymous" preload="metadata"></audio>
+
+    <div class="custom-player" role="region" aria-label="Audio player">
+        <div class="player-main-controls">
+            <button id="prev-btn" class="ctrl-btn ctrl-btn-sm" aria-label="Previous track" title="Previous (disabled until playlist loads)" disabled>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z"/></svg>
+            </button>
+            <button id="play-btn" class="ctrl-btn ctrl-btn-main" aria-label="Play" title="Play (Space)" disabled>
+                <span id="play-btn-content">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg>
+                </span>
+            </button>
+            <button id="next-btn" class="ctrl-btn ctrl-btn-sm" aria-label="Next track" title="Next (disabled until playlist loads)" disabled>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M16 6h2v12h-2V6zm-1.5 6L6 6v12l8.5-6z"/></svg>
+            </button>
+        </div>
+
+        <div class="progress-row">
+            <span class="time-text" id="current-time">0:00</span>
+            <div class="progress-track" id="progress-track" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0:00 of 0:00">
+                <div class="progress-track-rail">
+                    <div class="progress-buffered" id="progress-buffered"></div>
+                    <div class="progress-filled" id="progress-filled"></div>
+                </div>
+                <div class="progress-thumb" id="progress-thumb"></div>
+            </div>
+            <span class="time-text" id="duration-time">0:00</span>
+        </div>
+
+        <div class="volume-row">
+            <button id="mute-btn" class="ctrl-btn ctrl-btn-xs" aria-label="Mute" title="Mute (M)">
+                <svg id="volume-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg>
+            </button>
+            <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+        </div>
+    </div>
 
     <div class="controls-container">
         <button id="shuffle-btn" class="control-btn">shuffle</button>
@@ -465,13 +797,22 @@
         <button id="wake-lock-btn" class="control-btn">keep awake: off</button>
     </div>
 
-    <div class="playlist-header">
-        <span>Title</span>
-        <span>Artist</span>
+    <div class="playlist-tabs" role="tablist">
+        <button class="playlist-tab active" data-tab="playlist" role="tab" aria-selected="true">playlist · <span id="playlist-count">0</span></button>
+        <button class="playlist-tab" data-tab="library" role="tab" aria-selected="false">library · <span id="library-count">0</span></button>
+    </div>
+
+    <div class="playlist-toolbar" id="playlist-toolbar">
+        <button class="action-btn" id="clear-btn">clear</button>
+        <button class="action-btn" id="reset-btn">reset to all</button>
+    </div>
+    <div class="playlist-toolbar hidden" id="library-toolbar">
+        <button class="action-btn" id="add-all-btn">add all to playlist</button>
     </div>
 
     <div id="status" class="status-msg">fetching data from github...</div>
     <ul class="playlist" id="playlist"></ul>
+    <ul class="playlist hidden" id="library"></ul>
 </div>
 
 <script>
@@ -493,6 +834,32 @@
     const visualizer = document.getElementById('visualizer');
     const vizCtx = visualizer.getContext('2d');
 
+    // custom player refs
+    const playBtn = document.getElementById('play-btn');
+    const playBtnContent = document.getElementById('play-btn-content');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const muteBtn = document.getElementById('mute-btn');
+    const volumeIcon = document.getElementById('volume-icon');
+    const volumeSlider = document.getElementById('volume-slider');
+    const progressTrack = document.getElementById('progress-track');
+    const progressFilled = document.getElementById('progress-filled');
+    const progressBuffered = document.getElementById('progress-buffered');
+    const progressThumb = document.getElementById('progress-thumb');
+    const currentTimeEl = document.getElementById('current-time');
+    const durationTimeEl = document.getElementById('duration-time');
+
+    // SVG icons
+    const ICON_PLAY = '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg>';
+    const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"/></svg>';
+    const SPINNER = '<span class="spinner" aria-hidden="true"></span>';
+    const ICON_VOL_HIGH = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg>';
+    const ICON_VOL_LOW = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12z"/></svg>';
+    const ICON_VOL_MUTE = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm14.5 3 2.5-2.5-1.4-1.4L16 10.6l-2.1-2.1-1.4 1.4L14.6 12l-2.1 2.1 1.4 1.4L16 13.4l2.1 2.1 1.4-1.4L17 12z"/></svg>';
+    const ICON_PLUS = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>';
+    const ICON_CHECK = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+    const ICON_REMOVE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+
     const supportedExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.mp4'];
     const BASE_TITLE = 'hantavirus.';
 
@@ -500,9 +867,28 @@
     let currentTrackIndex = 0;
     let isShuffle = false;
     let repeatMode = 'none';
+    let isSeeking = false;
+    let lastVolume = 1; // remember volume before mute
 
     let wakeLockSentinel = null;
     let isKeepAwakeEnabled = false;
+
+    // playlist management state
+    let librarySongs = [];   // full catalog from repo (the only allowed source)
+    let activeTab = 'playlist';
+    let playingLibraryIndex = -1; // >=0 means currently playing from library (not playlist)
+    const PLAYLIST_STORAGE_KEY = 'hantavirus-playlist';
+
+    // playlist management refs
+    const libraryElement = document.getElementById('library');
+    const playlistCountEl = document.getElementById('playlist-count');
+    const libraryCountEl = document.getElementById('library-count');
+    const playlistToolbar = document.getElementById('playlist-toolbar');
+    const libraryToolbar = document.getElementById('library-toolbar');
+    const addAllBtn = document.getElementById('add-all-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const playlistTabs = document.querySelectorAll('.playlist-tab');
 
     /* =========================================================
        AUDIO VISUALIZER (Web Audio API + Canvas)
@@ -588,7 +974,6 @@
                 smoothed[i] = smoothed[i] * 0.72 + freqData[i] * 0.28;
             }
         } else {
-            // decay toward idle
             for (let i = 0; i < (smoothed ? smoothed.length : 0); i++) {
                 smoothed[i] *= 0.9;
             }
@@ -598,17 +983,14 @@
         const gap = (w / BAR_COUNT) * 0.45;
         const maxHeight = h * 0.78;
         const centerY = h * 0.5;
-
         const t = performance.now() / 1000;
 
         for (let i = 0; i < BAR_COUNT; i++) {
             let value;
             if (playing) {
-                // map bar index to frequency bin (skip very low bins)
                 const idx = Math.floor((i / BAR_COUNT) * (bufferLength * 0.85));
                 value = (smoothed[idx] || 0) / 255;
             } else {
-                // gentle idle wave
                 const phase = Math.sin(t * 1.6 + i * 0.32) * 0.5 + 0.5;
                 value = 0.04 + phase * 0.06;
             }
@@ -617,7 +999,6 @@
             const x = i * (barWidth + gap) + gap / 2;
             const y = centerY - barH / 2;
 
-            // main bar gradient
             const grad = vizCtx.createLinearGradient(0, y, 0, y + barH);
             grad.addColorStop(0, `rgba(${accentRgb}, ${playing ? 0.95 : 0.35})`);
             grad.addColorStop(0.5, `rgba(${accentRgb}, ${playing ? 0.7 : 0.25})`);
@@ -626,7 +1007,6 @@
             roundRect(vizCtx, x, y, barWidth, barH, barWidth / 2);
             vizCtx.fill();
 
-            // soft glow when loud
             if (playing && value > 0.55) {
                 vizCtx.shadowColor = `rgba(${accentRgb}, 0.6)`;
                 vizCtx.shadowBlur = 12;
@@ -634,7 +1014,6 @@
                 vizCtx.shadowBlur = 0;
             }
 
-            // subtle mirror reflection
             const reflectH = Math.min(barH * 0.45, h - (y + barH) - 2);
             if (reflectH > 1) {
                 const ry = y + barH + 2;
@@ -649,7 +1028,6 @@
     }
     drawVisualizer();
 
-    // resume AudioContext on any user gesture (autoplay policy)
     ['click', 'touchstart', 'keydown'].forEach(evt => {
         document.addEventListener(evt, resumeAudioContext, { passive: true });
     });
@@ -664,17 +1042,13 @@
             document.title = BASE_TITLE;
             return;
         }
+        const prefix = audioPlayer.paused ? '\u25A6 ' : '\u266A ';
         if (a && a !== 'unknown artist') {
-            document.title = `\u266A ${t} \u2014 ${a} \u00B7 ${BASE_TITLE}`;
+            document.title = `${prefix}${t} \u2014 ${a} \u00B7 ${BASE_TITLE}`;
         } else {
-            document.title = `\u266A ${t} \u00B7 ${BASE_TITLE}`;
+            document.title = `${prefix}${t} \u00B7 ${BASE_TITLE}`;
         }
     }
-
-    // reset title to base when tab regains focus & nothing is playing
-    audioPlayer.addEventListener('pause', () => {
-        // keep current song in title while paused (Spotify-like behaviour)
-    });
 
     /* =========================================================
        THEME
@@ -686,82 +1060,350 @@
     }
 
     themeSelect.addEventListener('change', (e) => {
-        const selectedTheme = e.target.value;
-        document.body.className = selectedTheme;
-        localStorage.setItem('user-theme', selectedTheme);
+        document.body.className = e.target.value;
+        localStorage.setItem('user-theme', e.target.value);
     });
 
     initTheme();
+
+    /* =========================================================
+       TIME + PROGRESS HELPERS
+       ========================================================= */
+    function formatTime(seconds) {
+        if (!seconds || isNaN(seconds) || !isFinite(seconds)) return '0:00';
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function updateProgressUI() {
+        const dur = audioPlayer.duration;
+        const cur = audioPlayer.currentTime;
+        const pct = dur && !isNaN(dur) ? (cur / dur) * 100 : 0;
+        if (!isSeeking) {
+            progressFilled.style.width = pct + '%';
+            progressThumb.style.left = pct + '%';
+        }
+        currentTimeEl.textContent = formatTime(cur);
+        durationTimeEl.textContent = formatTime(dur);
+        progressTrack.setAttribute('aria-valuenow', Math.round(pct));
+        progressTrack.setAttribute('aria-valuetext', `${formatTime(cur)} of ${formatTime(dur)}`);
+    }
+
+    function updateBufferedUI() {
+        const dur = audioPlayer.duration;
+        if (dur && audioPlayer.buffered.length > 0) {
+            const end = audioPlayer.buffered.end(audioPlayer.buffered.length - 1);
+            const pct = Math.min(100, (end / dur) * 100);
+            progressBuffered.style.width = pct + '%';
+        }
+    }
+
+    function updateVolumeIcon() {
+        const v = audioPlayer.volume;
+        if (audioPlayer.muted || v === 0) {
+            volumeIcon.outerHTML = ICON_VOL_MUTE;
+        } else if (v < 0.5) {
+            volumeIcon.outerHTML = ICON_VOL_LOW;
+        } else {
+            volumeIcon.outerHTML = ICON_VOL_HIGH;
+        }
+        // re-grab because outerHTML replaced the node
+        window._volumeIcon = document.getElementById('volume-icon');
+    }
+
+    /* =========================================================
+       CUSTOM PLAYER CONTROLS
+       ========================================================= */
+    function getCurrentSong() {
+        if (playingLibraryIndex >= 0 && playingLibraryIndex < librarySongs.length) {
+            return librarySongs[playingLibraryIndex];
+        }
+        if (currentTrackIndex >= 0 && currentTrackIndex < songsList.length) {
+            return songsList[currentTrackIndex];
+        }
+        return null;
+    }
+
+    function setPlayingState(isPlaying) {
+        if (isPlaying) {
+            playBtnContent.innerHTML = ICON_PAUSE;
+            playBtn.setAttribute('aria-label', 'Pause');
+        } else {
+            playBtnContent.innerHTML = ICON_PLAY;
+            playBtn.setAttribute('aria-label', 'Play');
+        }
+        // refresh dynamic title (paused glyph vs playing note)
+        const song = getCurrentSong();
+        if (song) {
+            const { title, artist } = parseSongData(song.name);
+            updateDocumentTitle(title, artist);
+        }
+    }
+
+    function setLoadingState(isLoading) {
+        if (isLoading) {
+            playBtnContent.innerHTML = SPINNER;
+        } else {
+            setPlayingState(!audioPlayer.paused);
+        }
+    }
+
+    function togglePlay() {
+        if (!songsList.length && playingLibraryIndex < 0) return;
+        resumeAudioContext();
+        if (audioPlayer.paused) {
+            audioPlayer.play().catch(err => {
+                console.log('Playback blocked:', err);
+                statusElement.style.display = 'block';
+                statusElement.innerText = 'Click play to start.';
+            });
+        } else {
+            audioPlayer.pause();
+        }
+    }
+
+    playBtn.addEventListener('click', togglePlay);
+
+    prevBtn.addEventListener('click', () => {
+        if (playingLibraryIndex >= 0) {
+            // library playback mode
+            if (audioPlayer.currentTime > 3) {
+                audioPlayer.currentTime = 0;
+            } else if (playingLibraryIndex > 0) {
+                playFromLibrary(playingLibraryIndex - 1);
+            } else {
+                audioPlayer.currentTime = 0;
+            }
+            return;
+        }
+        if (!songsList.length) return;
+        // if more than 3s in, restart current track; otherwise go to previous
+        if (audioPlayer.currentTime > 3 && currentTrackIndex >= 0) {
+            audioPlayer.currentTime = 0;
+        } else if (currentTrackIndex > 0) {
+            currentTrackIndex--;
+            playTrack(currentTrackIndex);
+        } else {
+            audioPlayer.currentTime = 0;
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (playingLibraryIndex >= 0) {
+            // library playback mode
+            if (isShuffle) {
+                let r;
+                do { r = Math.floor(Math.random() * librarySongs.length); }
+                while (librarySongs.length > 1 && r === playingLibraryIndex);
+                playFromLibrary(r);
+            } else if (playingLibraryIndex < librarySongs.length - 1) {
+                playFromLibrary(playingLibraryIndex + 1);
+            } else {
+                playFromLibrary(0);
+            }
+            return;
+        }
+        if (!songsList.length) return;
+        if (isShuffle) {
+            let r;
+            do { r = Math.floor(Math.random() * songsList.length); }
+            while (songsList.length > 1 && r === currentTrackIndex);
+            currentTrackIndex = r;
+        } else if (currentTrackIndex < songsList.length - 1) {
+            currentTrackIndex++;
+        } else {
+            currentTrackIndex = 0;
+        }
+        playTrack(currentTrackIndex);
+    });
+
+    // audio element events -> sync custom UI
+    audioPlayer.addEventListener('play', () => { setPlayingState(true); statusElement.style.display = 'none'; });
+    audioPlayer.addEventListener('pause', () => setPlayingState(false));
+    audioPlayer.addEventListener('waiting', () => setLoadingState(true));
+    audioPlayer.addEventListener('canplay', () => setLoadingState(false));
+    audioPlayer.addEventListener('playing', () => setLoadingState(false));
+    audioPlayer.addEventListener('timeupdate', updateProgressUI);
+    audioPlayer.addEventListener('loadedmetadata', () => { updateProgressUI(); updateBufferedUI(); });
+    audioPlayer.addEventListener('progress', updateBufferedUI);
+    audioPlayer.addEventListener('volumechange', () => {
+        volumeSlider.value = audioPlayer.muted ? 0 : audioPlayer.volume;
+        updateVolumeIcon();
+    });
+
+    /* ---- seek bar (mouse + touch + keyboard) ---- */
+    function seekToClientX(clientX) {
+        const rect = progressTrack.getBoundingClientRect();
+        let pct = (clientX - rect.left) / rect.width;
+        pct = Math.max(0, Math.min(1, pct));
+        progressFilled.style.width = (pct * 100) + '%';
+        progressThumb.style.left = (pct * 100) + '%';
+        if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
+            audioPlayer.currentTime = pct * audioPlayer.duration;
+            currentTimeEl.textContent = formatTime(pct * audioPlayer.duration);
+        }
+    }
+
+    progressTrack.addEventListener('mousedown', (e) => {
+        if (!audioPlayer.duration || isNaN(audioPlayer.duration)) return;
+        isSeeking = true;
+        progressTrack.classList.add('dragging');
+        seekToClientX(e.clientX);
+    });
+    document.addEventListener('mousemove', (e) => {
+        if (isSeeking) seekToClientX(e.clientX);
+    });
+    document.addEventListener('mouseup', () => {
+        if (isSeeking) {
+            isSeeking = false;
+            progressTrack.classList.remove('dragging');
+        }
+    });
+
+    progressTrack.addEventListener('touchstart', (e) => {
+        if (!audioPlayer.duration || isNaN(audioPlayer.duration)) return;
+        isSeeking = true;
+        progressTrack.classList.add('dragging');
+        if (e.touches[0]) seekToClientX(e.touches[0].clientX);
+    }, { passive: true });
+    document.addEventListener('touchmove', (e) => {
+        if (isSeeking && e.touches[0]) seekToClientX(e.touches[0].clientX);
+    }, { passive: true });
+    document.addEventListener('touchend', () => {
+        if (isSeeking) {
+            isSeeking = false;
+            progressTrack.classList.remove('dragging');
+        }
+    });
+
+    // keyboard seek on the progress track
+    progressTrack.addEventListener('keydown', (e) => {
+        if (!audioPlayer.duration || isNaN(audioPlayer.duration)) return;
+        const step = audioPlayer.duration * 0.05;
+        if (e.key === 'ArrowLeft') { e.preventDefault(); audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - step); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + step); }
+        else if (e.key === 'Home') { e.preventDefault(); audioPlayer.currentTime = 0; }
+        else if (e.key === 'End') { e.preventDefault(); audioPlayer.currentTime = audioPlayer.duration; }
+    });
+
+    /* ---- volume ---- */
+    function updateVolumeIconSafe() {
+        const v = audioPlayer.muted ? 0 : audioPlayer.volume;
+        let html;
+        if (v === 0) html = ICON_VOL_MUTE;
+        else if (v < 0.5) html = ICON_VOL_LOW;
+        else html = ICON_VOL_HIGH;
+        const wrapper = muteBtn;
+        wrapper.innerHTML = html;
+    }
+
+    volumeSlider.addEventListener('input', (e) => {
+        const v = parseFloat(e.target.value);
+        audioPlayer.volume = v;
+        audioPlayer.muted = (v === 0);
+        if (v > 0) lastVolume = v;
+        updateVolumeIconSafe();
+    });
+
+    function toggleMute() {
+        if (audioPlayer.muted || audioPlayer.volume === 0) {
+            audioPlayer.muted = false;
+            audioPlayer.volume = lastVolume || 1;
+            volumeSlider.value = audioPlayer.volume;
+        } else {
+            lastVolume = audioPlayer.volume;
+            audioPlayer.muted = true;
+            volumeSlider.value = 0;
+        }
+        updateVolumeIconSafe();
+    }
+    muteBtn.addEventListener('click', toggleMute);
+    updateVolumeIconSafe();
+
+    /* ---- global keyboard shortcuts ---- */
+    document.addEventListener('keydown', (e) => {
+        const tag = (e.target.tagName || '').toUpperCase();
+        if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+        if (e.target === progressTrack) return; // handled above
+        switch (e.code) {
+            case 'Space':
+                e.preventDefault();
+                togglePlay();
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                if (audioPlayer.duration) audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 5);
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                if (audioPlayer.duration) audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + 5);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                audioPlayer.volume = Math.min(1, audioPlayer.volume + 0.1);
+                if (audioPlayer.muted) { audioPlayer.muted = false; }
+                volumeSlider.value = audioPlayer.volume;
+                updateVolumeIconSafe();
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                audioPlayer.volume = Math.max(0, audioPlayer.volume - 0.1);
+                volumeSlider.value = audioPlayer.volume;
+                updateVolumeIconSafe();
+                break;
+            case 'KeyM':
+                e.preventDefault();
+                toggleMute();
+                break;
+        }
+    });
 
     /* =========================================================
        PLAYLIST FETCH + RENDER
        ========================================================= */
     async function fetchMusicFiles() {
         const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FOLDER_PATH}`;
-
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch data. Check configuration.');
-
             const files = await response.json();
-
-            songsList = files.filter(file => {
+            librarySongs = files.filter(file => {
                 if (file.type !== 'file') return false;
                 const fileNameLower = file.name.toLowerCase();
                 return supportedExtensions.some(ext => fileNameLower.endsWith(ext));
             });
-
-            if (songsList.length === 0) {
-                statusElement.innerText = "No music files found.";
+            if (librarySongs.length === 0) {
+                statusElement.innerText = 'No music files found.';
                 return;
             }
-
             statusElement.style.display = 'none';
-            renderPlaylist(songsList);
-            loadTrack(0);
 
+            // load saved playlist from localStorage, or default to entire library
+            const saved = loadSavedPlaylist();
+            songsList = (saved && saved.length) ? saved : [...librarySongs];
+            currentTrackIndex = 0;
+
+            renderPlaylist();
+            renderLibrary();
+            updateCounts();
+            if (songsList.length) loadTrack(0);
         } catch (error) {
-            statusElement.innerText = "Error: " + error.message;
+            statusElement.innerText = 'Error: ' + error.message;
             console.error(error);
         }
     }
 
     function parseSongData(filename) {
-        const songNameClean = filename.replace(/\.[^/.]+$/, "");
-        let artist = "unknown artist";
+        const songNameClean = filename.replace(/\.[^/.]+$/, '');
+        let artist = 'unknown artist';
         let title = songNameClean;
-
-        if (songNameClean.includes(" - ")) {
-            const parts = songNameClean.split(" - ");
+        if (songNameClean.includes(' - ')) {
+            const parts = songNameClean.split(' - ');
             artist = parts[0].trim();
             title = parts[1].trim();
         }
         return { title, artist };
-    }
-
-    function renderPlaylist(songs) {
-        playlistElement.innerHTML = '';
-        songs.forEach((song, index) => {
-            const li = document.createElement('li');
-            li.setAttribute('data-index', index);
-            const { title, artist } = parseSongData(song.name);
-
-            li.innerHTML = `
-                <div class="song-title-wrapper">
-                    <span class="eq-mini" aria-hidden="true"><span></span><span></span><span></span></span>
-                    <span class="song-index">${index + 1}</span>
-                    <span class="song-title">${escapeHtml(title)}</span>
-                </div>
-                <span class="song-artist">${escapeHtml(artist)}</span>
-            `;
-
-            li.addEventListener('click', () => {
-                currentTrackIndex = index;
-                playTrack(currentTrackIndex);
-            });
-
-            playlistElement.appendChild(li);
-        });
     }
 
     function escapeHtml(str) {
@@ -773,33 +1415,102 @@
             .replace(/'/g, '&#39;');
     }
 
+    function renderPlaylist() {
+        playlistElement.innerHTML = '';
+        if (songsList.length === 0) {
+            const empty = document.createElement('li');
+            empty.className = 'empty-state';
+            empty.style.cursor = 'default';
+            empty.innerHTML = 'playlist is empty — switch to the library tab to add songs';
+            playlistElement.appendChild(empty);
+        } else {
+            songsList.forEach((song, index) => {
+                const li = document.createElement('li');
+                li.setAttribute('data-index', index);
+                const { title, artist } = parseSongData(song.name);
+                li.innerHTML = `
+                    <div class="song-title-wrapper">
+                        <span class="eq-mini" aria-hidden="true"><span></span><span></span><span></span></span>
+                        <span class="song-index">${index + 1}</span>
+                        <span class="song-title">${escapeHtml(title)}</span>
+                    </div>
+                    <div class="song-row-right">
+                        <span class="song-artist">${escapeHtml(artist)}</span>
+                        <button class="row-action-btn" data-action="remove" aria-label="Remove from playlist" title="Remove from playlist">${ICON_REMOVE}</button>
+                    </div>
+                `;
+                li.addEventListener('click', (e) => {
+                    if (e.target.closest('[data-action="remove"]')) return;
+                    currentTrackIndex = index;
+                    playTrack(currentTrackIndex);
+                });
+                li.querySelector('[data-action="remove"]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeFromPlaylist(index);
+                });
+                playlistElement.appendChild(li);
+            });
+        }
+        highlightActiveTrack();
+        updatePlayerControlsEnabled();
+    }
+
+    function highlightActiveTrack() {
+        const allItems = playlistElement.querySelectorAll('li[data-index]');
+        allItems.forEach(item => item.classList.remove('active'));
+        if (currentTrackIndex >= 0 && currentTrackIndex < songsList.length) {
+            const activeItem = playlistElement.querySelector(`li[data-index="${currentTrackIndex}"]`);
+            if (activeItem) activeItem.classList.add('active');
+        }
+    }
+
     function loadTrack(index) {
+        if (!songsList.length || index < 0 || index >= songsList.length) return;
+        playingLibraryIndex = -1; // switch to playlist playback mode
         const song = songsList[index];
         const { title, artist } = parseSongData(song.name);
-
         audioPlayer.src = song.download_url;
         nowPlayingElement.innerText = title;
         nowPlayingArtistElement.innerText = artist;
         updateDocumentTitle(title, artist);
-
-        const allItems = playlistElement.querySelectorAll('li');
-        allItems.forEach(item => item.classList.remove('active'));
-        const activeItem = playlistElement.querySelector(`li[data-index="${index}"]`);
-        if (activeItem) activeItem.classList.add('active');
+        highlightActiveTrack();
+        highlightActiveLibraryTrack();
     }
 
     function playTrack(index) {
         loadTrack(index);
         resumeAudioContext();
         audioPlayer.play().catch(error => {
-            console.log("Autoplay blocked.", error);
+            console.log('Autoplay blocked.', error);
             statusElement.style.display = 'block';
-            statusElement.innerText = "Click play to start.";
+            statusElement.innerText = 'Click play to start.';
         });
         statusElement.style.display = 'none';
     }
 
     audioPlayer.addEventListener('ended', () => {
+        if (playingLibraryIndex >= 0) {
+            // library playback mode
+            if (repeatMode === 'one') {
+                playFromLibrary(playingLibraryIndex);
+            } else if (isShuffle) {
+                let r;
+                do { r = Math.floor(Math.random() * librarySongs.length); }
+                while (librarySongs.length > 1 && r === playingLibraryIndex);
+                playFromLibrary(r);
+            } else {
+                if (playingLibraryIndex < librarySongs.length - 1) {
+                    playFromLibrary(playingLibraryIndex + 1);
+                } else if (repeatMode === 'all') {
+                    playFromLibrary(0);
+                } else {
+                    nowPlayingElement.innerText = 'library finished.';
+                    nowPlayingArtistElement.innerText = '';
+                    updateDocumentTitle('', '');
+                }
+            }
+            return;
+        }
         if (repeatMode === 'one') {
             playTrack(currentTrackIndex);
         } else if (isShuffle) {
@@ -817,8 +1528,8 @@
                 currentTrackIndex = 0;
                 playTrack(currentTrackIndex);
             } else {
-                nowPlayingElement.innerText = "playlist finished.";
-                nowPlayingArtistElement.innerText = "";
+                nowPlayingElement.innerText = 'playlist finished.';
+                nowPlayingArtistElement.innerText = '';
                 updateDocumentTitle('', '');
             }
         }
@@ -845,7 +1556,240 @@
         }
     });
 
-    // WAKE LOCK LOGIC
+    /* =========================================================
+       PLAYLIST MANAGEMENT (library catalog → user playlist)
+       Only songs already in the repo can be added. No uploads,
+       no external URLs — the catalog is the single source.
+       ========================================================= */
+    function playFromLibrary(libraryIndex) {
+        if (libraryIndex < 0 || libraryIndex >= librarySongs.length) return;
+        playingLibraryIndex = libraryIndex;
+        const song = librarySongs[libraryIndex];
+        resumeAudioContext();
+        audioPlayer.src = song.download_url;
+        const { title, artist } = parseSongData(song.name);
+        nowPlayingElement.innerText = title;
+        nowPlayingArtistElement.innerText = artist;
+        updateDocumentTitle(title, artist);
+        // clear playlist highlight (playing directly from library, not the playlist queue)
+        document.querySelectorAll('#playlist li[data-index]').forEach(li => li.classList.remove('active'));
+        highlightActiveLibraryTrack();
+        audioPlayer.play().catch(error => {
+            console.log('Autoplay blocked.', error);
+            statusElement.style.display = 'block';
+            statusElement.innerText = 'Click play to start.';
+        });
+        statusElement.style.display = 'none';
+    }
+
+    function highlightActiveLibraryTrack() {
+        document.querySelectorAll('#library li[data-lib-index]').forEach(li => li.classList.remove('active'));
+        if (playingLibraryIndex >= 0) {
+            const activeItem = libraryElement.querySelector(`li[data-lib-index="${playingLibraryIndex}"]`);
+            if (activeItem) activeItem.classList.add('active');
+        }
+    }
+
+    function updatePlayerControlsEnabled() {
+        // enable transport controls if there is anything to play (playlist or library)
+        const hasContent = songsList.length > 0 || librarySongs.length > 0;
+        playBtn.disabled = !hasContent;
+        prevBtn.disabled = !hasContent;
+        nextBtn.disabled = !hasContent;
+        if (hasContent) {
+            prevBtn.title = 'Previous track';
+            nextBtn.title = 'Next track';
+            playBtn.title = 'Play (Space)';
+        }
+    }
+
+    function renderLibrary() {
+        libraryElement.innerHTML = '';
+        if (librarySongs.length === 0) {
+            const empty = document.createElement('li');
+            empty.className = 'empty-state';
+            empty.style.cursor = 'default';
+            empty.innerHTML = 'library is empty';
+            libraryElement.appendChild(empty);
+            updatePlayerControlsEnabled();
+            return;
+        }
+        const playlistUrls = new Set(songsList.map(s => s.download_url));
+        librarySongs.forEach((song, index) => {
+            const li = document.createElement('li');
+            li.setAttribute('data-lib-index', index);
+            const { title, artist } = parseSongData(song.name);
+            const inPlaylist = playlistUrls.has(song.download_url);
+            li.innerHTML = `
+                <div class="song-title-wrapper">
+                    <span class="song-index">${index + 1}</span>
+                    <span class="song-title">${escapeHtml(title)}</span>
+                </div>
+                <div class="song-row-right">
+                    <span class="song-artist">${escapeHtml(artist)}</span>
+                    <button class="row-action-btn ${inPlaylist ? 'added' : ''}" data-action="add" ${inPlaylist ? 'disabled' : ''} aria-label="${inPlaylist ? 'Already in playlist' : 'Add to playlist'}" title="${inPlaylist ? 'Already in playlist' : 'Add to playlist'}">${inPlaylist ? ICON_CHECK : ICON_PLUS}</button>
+                </div>
+            `;
+            // click the row → play the song directly (does NOT add to playlist)
+            li.addEventListener('click', (e) => {
+                if (e.target.closest('[data-action="add"]')) return;
+                playFromLibrary(index);
+            });
+            // click the + button → add to playlist
+            if (!inPlaylist) {
+                const btn = li.querySelector('[data-action="add"]');
+                btn.addEventListener('click', (e) => { e.stopPropagation(); addToPlaylist(song); });
+            }
+            libraryElement.appendChild(li);
+        });
+        highlightActiveLibraryTrack();
+        updatePlayerControlsEnabled();
+    }
+
+    function addToPlaylist(song) {
+        if (songsList.some(s => s.download_url === song.download_url)) return;
+        const wasEmpty = songsList.length === 0;
+        songsList.push(song);
+        savePlaylist();
+        renderPlaylist();
+        renderLibrary();
+        updateCounts();
+        // only auto-load the first track if nothing else is playing/loaded
+        if (wasEmpty && playingLibraryIndex < 0 && !audioPlayer.src) {
+            currentTrackIndex = songsList.length - 1;
+            loadTrack(currentTrackIndex);
+        }
+    }
+
+    function removeFromPlaylist(index) {
+        if (index < 0 || index >= songsList.length) return;
+        const wasCurrent = playingLibraryIndex < 0 && index === currentTrackIndex;
+        const wasPlaying = !audioPlayer.paused;
+        songsList.splice(index, 1);
+
+        if (songsList.length === 0) {
+            // only stop audio if we were playing from the playlist (not library)
+            if (playingLibraryIndex < 0) {
+                audioPlayer.pause();
+                audioPlayer.removeAttribute('src');
+                audioPlayer.load();
+                currentTrackIndex = 0;
+                nowPlayingElement.innerText = 'playlist empty.';
+                nowPlayingArtistElement.innerText = '';
+                updateDocumentTitle('', '');
+                setPlayingState(false);
+            }
+        } else if (wasCurrent) {
+            if (currentTrackIndex >= songsList.length) currentTrackIndex = songsList.length - 1;
+            if (wasPlaying) playTrack(currentTrackIndex);
+            else loadTrack(currentTrackIndex);
+        } else if (index < currentTrackIndex) {
+            currentTrackIndex--;
+        }
+        savePlaylist();
+        renderPlaylist();
+        renderLibrary();
+        updateCounts();
+    }
+
+    function switchTab(tab) {
+        activeTab = tab;
+        playlistTabs.forEach(t => {
+            const isActive = t.dataset.tab === tab;
+            t.classList.toggle('active', isActive);
+            t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        playlistElement.classList.toggle('hidden', tab !== 'playlist');
+        libraryElement.classList.toggle('hidden', tab !== 'library');
+        playlistToolbar.classList.toggle('hidden', tab !== 'playlist');
+        libraryToolbar.classList.toggle('hidden', tab !== 'library');
+    }
+
+    playlistTabs.forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+
+    function updateCounts() {
+        playlistCountEl.textContent = songsList.length;
+        libraryCountEl.textContent = librarySongs.length;
+    }
+
+    function savePlaylist() {
+        try {
+            const urls = songsList.map(s => s.download_url);
+            localStorage.setItem(PLAYLIST_STORAGE_KEY, JSON.stringify(urls));
+        } catch (e) { /* ignore quota errors */ }
+    }
+
+    function loadSavedPlaylist() {
+        try {
+            const raw = localStorage.getItem(PLAYLIST_STORAGE_KEY);
+            if (!raw) return null;
+            const urls = JSON.parse(raw);
+            if (!Array.isArray(urls)) return null;
+            const map = new Map(librarySongs.map(s => [s.download_url, s]));
+            const result = urls.map(u => map.get(u)).filter(Boolean);
+            return result.length ? result : null;
+        } catch (e) { return null; }
+    }
+
+    addAllBtn.addEventListener('click', () => {
+        const wasEmpty = songsList.length === 0;
+        const nothingPlaying = playingLibraryIndex < 0 && !audioPlayer.src;
+        let added = false;
+        librarySongs.forEach(song => {
+            if (!songsList.some(s => s.download_url === song.download_url)) {
+                songsList.push(song);
+                added = true;
+            }
+        });
+        if (added) {
+            savePlaylist();
+            renderPlaylist();
+            renderLibrary();
+            updateCounts();
+            // if playlist was empty and nothing is loaded yet, prep the first track
+            if (wasEmpty && nothingPlaying && songsList.length) {
+                currentTrackIndex = 0;
+                loadTrack(0);
+            }
+        }
+    });
+
+    clearBtn.addEventListener('click', () => {
+        if (!songsList.length) return;
+        // only stop audio if playing from the playlist (library playback continues)
+        if (playingLibraryIndex < 0) {
+            audioPlayer.pause();
+            audioPlayer.removeAttribute('src');
+            audioPlayer.load();
+            nowPlayingElement.innerText = 'playlist empty.';
+            nowPlayingArtistElement.innerText = '';
+            updateDocumentTitle('', '');
+            setPlayingState(false);
+        }
+        songsList = [];
+        currentTrackIndex = 0;
+        savePlaylist();
+        renderPlaylist();
+        renderLibrary();
+        updateCounts();
+    });
+
+    resetBtn.addEventListener('click', () => {
+        if (!librarySongs.length) return;
+        songsList = [...librarySongs];
+        currentTrackIndex = 0;
+        savePlaylist();
+        renderPlaylist();
+        renderLibrary();
+        updateCounts();
+        loadTrack(0);
+    });
+
+    /* =========================================================
+       WAKE LOCK (kept intact from original)
+       ========================================================= */
     async function requestWakeLock() {
         try {
             if ('wakeLock' in navigator) {
@@ -855,7 +1799,7 @@
                 });
                 updateWakeLockUI(true);
             } else {
-                alert("Browser not supporting Wake Lock.");
+                alert('Browser not supporting Wake Lock.');
                 isKeepAwakeEnabled = false;
                 updateWakeLockUI(false);
             }
@@ -895,6 +1839,7 @@
         }
     });
 
+    // init
     fetchMusicFiles();
 </script>
 
