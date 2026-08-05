@@ -1042,11 +1042,10 @@
             document.title = BASE_TITLE;
             return;
         }
-        const prefix = audioPlayer.paused ? '\u25A6 ' : '\u266A ';
         if (a && a !== 'unknown artist') {
-            document.title = `${prefix}${t} \u2014 ${a} \u00B7 ${BASE_TITLE}`;
+            document.title = `${t} \u2014 ${a} \u00B7 ${BASE_TITLE}`;
         } else {
-            document.title = `${prefix}${t} \u00B7 ${BASE_TITLE}`;
+            document.title = `${t} \u00B7 ${BASE_TITLE}`;
         }
     }
 
@@ -1133,7 +1132,7 @@
             playBtnContent.innerHTML = ICON_PLAY;
             playBtn.setAttribute('aria-label', 'Play');
         }
-        // refresh dynamic title (paused glyph vs playing note)
+        // refresh dynamic title
         const song = getCurrentSong();
         if (song) {
             const { title, artist } = parseSongData(song.name);
