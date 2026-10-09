@@ -1,19 +1,36 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-mode="light" data-accent="blue">
 <head>
     <meta charset="UTF-8">
     <script>
-    // pasang data-theme SEBELUM render agar tidak ada flash tema salah (FOUC)
     (function () {
-        var KEY = 'user-theme';
-        var LIST = ['light','dark','oled','phosphor','mono','ember','crimson','mist','lagoon'];
-        var saved = null;
-        try { saved = localStorage.getItem(KEY); } catch (e) { /* storage bisa diblokir */ }
-        if (LIST.indexOf(saved) < 0) {
-            // kunjungan pertama mengikuti preferensi sistem
-            saved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        var LEGACY = 'user-theme';
+        var KEY_MODE = 'user-theme-mode';
+        var KEY_COLOR = 'user-theme-color';
+        var MODES = ['light', 'dark', 'oled'];
+        var COLORS = ['blue', 'green', 'teal', 'orange', 'red', 'pink', 'violet', 'mono'];
+        var MIGRATE = {
+            light: ['light', 'blue'], dark: ['dark', 'blue'], oled: ['oled', 'violet'],
+            phosphor: ['dark', 'green'], mono: ['light', 'mono'], ember: ['dark', 'orange'],
+            crimson: ['dark', 'red'], mist: ['light', 'mono'], lagoon: ['dark', 'teal']
+        };
+        var mode = null, color = null;
+        try {
+            mode = localStorage.getItem(KEY_MODE);
+            color = localStorage.getItem(KEY_COLOR);
+            if (MODES.indexOf(mode) < 0 || COLORS.indexOf(color) < 0) {
+                var old = localStorage.getItem(LEGACY);
+                if (old && MIGRATE[old]) { mode = MIGRATE[old][0]; color = MIGRATE[old][1]; }
+            }
+        } catch (e) { /* storage bisa diblokir */ }
+        if (MODES.indexOf(mode) < 0) {
+            mode = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
         }
-        document.documentElement.setAttribute('data-theme', saved);
+        if (COLORS.indexOf(color) < 0) color = 'blue';
+        var root = document.documentElement;
+        root.setAttribute('data-mode', mode);
+        root.setAttribute('data-accent', color);
+        root.removeAttribute('data-theme');
     })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +50,8 @@
            Prinsip: minimal, futuristik lewat struktur (hairline,
            grid tegas, angka indeks), satu warna aksen per tema.
            Semua warna/garis/permukaan HANYA lewat custom
-           properties pada selector [data-theme="..."].
+           properties pada selector [data-mode] (permukaan)
+           dan [data-accent] (aksen).
            ===================================================== */
 
         :root {
@@ -41,144 +59,27 @@
             --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
         }
 
-        /* ---------- tema 1/5: terang ---------- */
-        [data-theme="light"] {
-            color-scheme: light;
-            --bg-body: #f4f4f0;
-            --bg-panel: #fdfdfb;
-            --bg-item: #efefe9;
-            --bg-item-hover: #e8e8e0;
-            --text-main: #191919;
-            --text-sub: #5b5b55;
-            --accent: #0b45d0;
-            --accent-rgb: 11, 69, 208;
-            --on-accent: #ffffff;
-            --on-accent-rgb: 255, 255, 255;
-            --border: #d8d8cf;
-            --track-bg: #dcdcd3;
-            --buffer-bg: #b9b9ac;
-            --viz-bg: #fafaf5;
-        }
-
-        /* ---------- tema 2/5: gelap ---------- */
-        [data-theme="dark"] {
-            color-scheme: dark;
-            --bg-body: #0d0e12;
-            --bg-panel: #131519;
-            --bg-item: #191c21;
-            --bg-item-hover: #20242b;
-            --text-main: #e9eae6;
-            --text-sub: #9ba0a6;
-            --accent: #58a6ff;
-            --accent-rgb: 88, 166, 255;
-            --on-accent: #0b111e;
-            --on-accent-rgb: 11, 17, 30;
-            --border: #262a31;
-            --track-bg: #23272e;
-            --buffer-bg: #3a414c;
-            --viz-bg: #101216;
-        }
-
-        /* ---------- tema 3/5: OLED (hitam pekat) ---------- */
-        [data-theme="oled"] {
-            color-scheme: dark;
-            --bg-body: #000000;
-            --bg-panel: #000000;
-            --bg-item: #0a0a0a;
-            --bg-item-hover: #131313;
-            --text-main: #f2f2f2;
-            --text-sub: #9c9c9c;
-            --accent: #a78bfa;
-            --accent-rgb: 167, 139, 250;
-            --on-accent: #150b26;
-            --on-accent-rgb: 21, 11, 38;
-            --border: #242424;
-            --track-bg: #1e1e1e;
-            --buffer-bg: #343434;
-            --viz-bg: #000000;
-        }
-
-        /* ---------- tema 4/5: fosfor / terminal CRT ---------- */
-        [data-theme="phosphor"] {
-            color-scheme: dark;
-            --bg-body: #010601;
-            --bg-panel: #020a02;
-            --bg-item: #041508;
-            --bg-item-hover: #071d0c;
-            --text-main: #8effb0;
-            --text-sub: #3fbf6f;
-            --accent: #4dfc83;
-            --accent-rgb: 77, 252, 131;
-            --on-accent: #01130a;
-            --on-accent-rgb: 1, 19, 10;
-            --border: #123b1e;
-            --track-bg: #0d3519;
-            --buffer-bg: #175225;
-            --viz-bg: #031005;
-        }
-
-        /* ---------- tema 5/5: mono (grayscale) ---------- */
-        [data-theme="mono"] {
-            color-scheme: light;
-            --bg-body: #efefef;
-            --bg-panel: #f7f7f7;
-            --bg-item: #e7e7e7;
-            --bg-item-hover: #dedede;
-            --text-main: #111111;
-            --text-sub: #555555;
-            --accent: #111111;
-            --accent-rgb: 17, 17, 17;
-            --on-accent: #ffffff;
-            --on-accent-rgb: 255, 255, 255;
-            --border: #cfcfcf;
-            --track-bg: #d6d6d6;
-            --buffer-bg: #b5b5b5;
-            --viz-bg: #f2f2f2;
-        }
-
-        /* ---------- tema 6/9: ember (oranye-hitam) ---------- */
-        [data-theme="ember"] {
-            color-scheme: dark;
-            --bg-body: #0b0806; --bg-panel: #120d09; --bg-item: #1a120b;
-            --bg-item-hover: #241811; --text-main: #f5ede4; --text-sub: #a8917d;
-            --accent: #ff6b1a; --accent-rgb: 255, 107, 26;
-            --on-accent: #1a0d03; --on-accent-rgb: 26, 13, 3;
-            --border: #2e2117; --track-bg: #241a11; --buffer-bg: #40301f;
-            --viz-bg: #0e0a07;
-        }
-
-        /* ---------- tema 7/9: crimson (merah-hitam) ---------- */
-        [data-theme="crimson"] {
-            color-scheme: dark;
-            --bg-body: #0c0507; --bg-panel: #130709; --bg-item: #1a0a0d;
-            --bg-item-hover: #260e12; --text-main: #f7ecec; --text-sub: #a98689;
-            --accent: #ff3b4e; --accent-rgb: 255, 59, 78;
-            --on-accent: #1c0407; --on-accent-rgb: 28, 4, 7;
-            --border: #2e1318; --track-bg: #250f13; --buffer-bg: #432026;
-            --viz-bg: #0f0608;
-        }
-
-        /* ---------- tema 8/9: mist (abu-putih) ---------- */
-        [data-theme="mist"] {
-            color-scheme: light;
-            --bg-body: #e6e7e8; --bg-panel: #f4f5f6; --bg-item: #ecedef;
-            --bg-item-hover: #e2e3e6; --text-main: #16181a; --text-sub: #5a5f66;
-            --accent: #2b2f33; --accent-rgb: 43, 47, 51;
-            --on-accent: #ffffff; --on-accent-rgb: 255, 255, 255;
-            --border: #c9ccd0; --track-bg: #d5d8dc; --buffer-bg: #afb4ba;
-            --viz-bg: #eff0f2;
-        }
-
-        /* ---------- tema 9/9: lagoon (teal-hitam) ---------- */
-        [data-theme="lagoon"] {
-            color-scheme: dark;
-            --bg-body: #04100e; --bg-panel: #071713; --bg-item: #0b201b;
-            --bg-item-hover: #102a23; --text-main: #e2f2ec; --text-sub: #7fa79b;
-            --accent: #2dd4a7; --accent-rgb: 45, 212, 167;
-            --on-accent: #02110c; --on-accent-rgb: 2, 17, 12;
-            --border: #10332b; --track-bg: #0c2a23; --buffer-bg: #1a473c;
-            --viz-bg: #051511;
-        }
+        /* mode: permukaan netral */
+        [data-mode="light"]{color-scheme:light;--bg-body:#f4f4f0;--bg-panel:#fdfdfb;--bg-item:#efefe9;--bg-item-hover:#e8e8e0;--text-main:#191919;--text-sub:#5b5b55;--border:#d8d8cf;--track-bg:#dcdcd3;--buffer-bg:#b9b9ac;--viz-bg:#fafaf5}
+        [data-mode="dark"]{color-scheme:dark;--bg-body:#0d0e12;--bg-panel:#131519;--bg-item:#191c21;--bg-item-hover:#20242b;--text-main:#e9eae6;--text-sub:#9ba0a6;--border:#262a31;--track-bg:#23272e;--buffer-bg:#3a414c;--viz-bg:#101216}
+        [data-mode="oled"]{color-scheme:dark;--bg-body:#000;--bg-panel:#000;--bg-item:#0a0a0a;--bg-item-hover:#131313;--text-main:#f2f2f2;--text-sub:#9c9c9c;--border:#242424;--track-bg:#1e1e1e;--buffer-bg:#343434;--viz-bg:#000}
+        /* warna: aksen per mode (light terpisah; dark & oled sama) */
+        [data-accent="blue"][data-mode="light"]{--accent:#0b45d0;--accent-rgb:11,69,208;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="blue"][data-mode="dark"],[data-accent="blue"][data-mode="oled"]{--accent:#58a6ff;--accent-rgb:88,166,255;--on-accent:#0b111e;--on-accent-rgb:11,17,30}
+        [data-accent="green"][data-mode="light"]{--accent:#1a7f37;--accent-rgb:26,127,55;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="green"][data-mode="dark"],[data-accent="green"][data-mode="oled"]{--accent:#4dfc83;--accent-rgb:77,252,131;--on-accent:#01130a;--on-accent-rgb:1,19,10}
+        [data-accent="teal"][data-mode="light"]{--accent:#0f766e;--accent-rgb:15,118,110;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="teal"][data-mode="dark"],[data-accent="teal"][data-mode="oled"]{--accent:#2dd4a7;--accent-rgb:45,212,167;--on-accent:#02110c;--on-accent-rgb:2,17,12}
+        [data-accent="orange"][data-mode="light"]{--accent:#c2410c;--accent-rgb:194,65,12;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="orange"][data-mode="dark"],[data-accent="orange"][data-mode="oled"]{--accent:#ff6b1a;--accent-rgb:255,107,26;--on-accent:#1a0d03;--on-accent-rgb:26,13,3}
+        [data-accent="red"][data-mode="light"]{--accent:#c62828;--accent-rgb:198,40,40;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="red"][data-mode="dark"],[data-accent="red"][data-mode="oled"]{--accent:#ff3b4e;--accent-rgb:255,59,78;--on-accent:#1c0407;--on-accent-rgb:28,4,7}
+        [data-accent="pink"][data-mode="light"]{--accent:#c2185b;--accent-rgb:194,24,91;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="pink"][data-mode="dark"],[data-accent="pink"][data-mode="oled"]{--accent:#ff5c8a;--accent-rgb:255,92,138;--on-accent:#1f040c;--on-accent-rgb:31,4,12}
+        [data-accent="violet"][data-mode="light"]{--accent:#6d28d9;--accent-rgb:109,40,217;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="violet"][data-mode="dark"],[data-accent="violet"][data-mode="oled"]{--accent:#a78bfa;--accent-rgb:167,139,250;--on-accent:#150b26;--on-accent-rgb:21,11,38}
+        [data-accent="mono"][data-mode="light"]{--accent:#111;--accent-rgb:17,17,17;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="mono"][data-mode="dark"],[data-accent="mono"][data-mode="oled"]{--accent:#d4d4d4;--accent-rgb:212,212,212;--on-accent:#111;--on-accent-rgb:17,17,17}
 
         * { box-sizing: border-box; }
 
@@ -256,10 +157,13 @@
             transition: color 0.35s ease;
         }
 
+        /* grid dua kolom: label (mode:/color:) + grup tombol, agar 8 tombol warna tidak meluber */
         .theme-selector-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
             align-items: center;
-            gap: 10px;
+            gap: 8px 10px;
+            width: 100%;
             font-family: var(--font-mono);
             font-size: 10px;
             letter-spacing: 0.14em;
@@ -791,29 +695,21 @@
            transisi CSS selama blend agar tidak terjadi animasi ganda. */
         .theme-lerp *, .theme-lerp *::before, .theme-lerp *::after { transition: none !important; }
 
-        /* ---------- denyut klik ganti tema (tetesan air) ---------- */
-        /* Umpan balik instan di titik klik: titik tetesan menyala sekejap
-           ("plip"), lalu tiga riak hairline melebar makin lemah dan makin
-           pelan — seperti gelombang di permukaan air. Dianimasikan lewat
-           Web Animations API (hanya transform & opacity — bebas reflow,
-           tak menyentuh jalur blend warna). pointer-events:none -> klik
-           tidak pernah tertelan. Warna di-set per-denyut dari JS; opacity
-           dasa 0 = tak terlihat di luar denyut. */
+        /* ---------- denyut klik ganti tema ---------- */
+        /* Umpan balik instan di titik klik: dua cincin hairline mengembang
+           berwarna aksen tema TUJUAN. Dianimasikan lewat Web Animations API
+           (hanya transform & opacity — bebas reflow, tak menyentuh jalur
+           blend warna). pointer-events:none -> klik tidak pernah tertelan.
+           Warna border di-set per-denyut dari JS; opacity dasa 0 = tak
+           terlihat di luar denyut. */
         #theme-pulse {
             position: fixed; left: 0; top: 0; width: 0; height: 0;
             pointer-events: none; z-index: 2147483000;
         }
-        #theme-pulse .pulse-dot {
-            position: absolute; left: -9px; top: -9px;
-            width: 18px; height: 18px; border-radius: 50%;
-            background: var(--accent);
-            opacity: 0;
-            will-change: transform, opacity;
-        }
         #theme-pulse .pulse-ring {
-            position: absolute; left: -110px; top: -110px;
-            width: 220px; height: 220px; border-radius: 50%;
-            border: 1px solid var(--accent);
+            position: absolute; left: -140px; top: -140px;
+            width: 280px; height: 280px; border-radius: 50%;
+            border: 1.5px solid var(--accent);
             opacity: 0;
             will-change: transform, opacity;
         }
@@ -855,17 +751,22 @@
     <header class="head-row">
         <h2>HANTABIRUSSSS</h2>
         <div class="theme-selector-container" role="group" aria-label="theme">
-            <span aria-hidden="true">theme:</span>
-            <div class="theme-switch">
-                <button type="button" class="theme-btn" data-set-theme="light" aria-pressed="false">light</button>
-                <button type="button" class="theme-btn" data-set-theme="dark" aria-pressed="false">dark</button>
-                <button type="button" class="theme-btn" data-set-theme="oled" aria-pressed="false">oled</button>
-                <button type="button" class="theme-btn" data-set-theme="phosphor" aria-pressed="false">phosphor</button>
-                <button type="button" class="theme-btn" data-set-theme="mono" aria-pressed="false">mono</button>
-                <button type="button" class="theme-btn" data-set-theme="ember" aria-pressed="false">ember</button>
-                <button type="button" class="theme-btn" data-set-theme="crimson" aria-pressed="false">crimson</button>
-                <button type="button" class="theme-btn" data-set-theme="mist" aria-pressed="false">mist</button>
-                <button type="button" class="theme-btn" data-set-theme="lagoon" aria-pressed="false">lagoon</button>
+            <span aria-hidden="true">mode:</span>
+            <div class="theme-switch" id="mode-switch">
+                <button type="button" class="theme-btn" data-set-mode="light" aria-pressed="false">light</button>
+                <button type="button" class="theme-btn" data-set-mode="dark" aria-pressed="false">dark</button>
+                <button type="button" class="theme-btn" data-set-mode="oled" aria-pressed="false">oled</button>
+            </div>
+            <span aria-hidden="true">color:</span>
+            <div class="theme-switch" id="color-switch">
+                <button type="button" class="theme-btn" data-set-color="blue" aria-pressed="false">blue</button>
+                <button type="button" class="theme-btn" data-set-color="green" aria-pressed="false">green</button>
+                <button type="button" class="theme-btn" data-set-color="teal" aria-pressed="false">teal</button>
+                <button type="button" class="theme-btn" data-set-color="orange" aria-pressed="false">orange</button>
+                <button type="button" class="theme-btn" data-set-color="red" aria-pressed="false">red</button>
+                <button type="button" class="theme-btn" data-set-color="pink" aria-pressed="false">pink</button>
+                <button type="button" class="theme-btn" data-set-color="violet" aria-pressed="false">violet</button>
+                <button type="button" class="theme-btn" data-set-color="mono" aria-pressed="false">mono</button>
             </div>
         </div>
     </header>
@@ -1097,11 +998,12 @@
     }
 
     // ---- warna: cache + SISTEM BLEND ANTAR-TEMA ----
-    // Mutasi data-theme tidak lagi menukar string warna seketika. Warna kondisi
-    // TERKINI menjadi titik "from", warna tema baru menjadi "target"; loop render
-    // menginterpolasi from -> target BERBASIS TIMESTAMP (easeOutCubic, 600 ms) —
-    // bukan pengali tetap per-frame, sehingga hasil identik di 30/60/144 Hz.
-    // Durasi 600 ms = durasi blend UI di applyTheme() (THEME_LERP_MS) agar
+    // Perubahan data-mode / data-accent tidak lagi menukar string warna seketika.
+    // Warna kondisi TERKINI menjadi titik "from", warna kombinasi (mode,warna) baru
+    // menjadi "target"; loop render menginterpolasi from -> target BERBASIS TIMESTAMP
+    // (easeOutCubic, 600 ms) — bukan pengali tetap per-frame, sehingga hasil identik
+    // di 30/60/144 Hz.
+    // Durasi 600 ms = durasi blend UI di applyThemeChange() (THEME_LERP_MS) agar
     // visualizer dan seluruh antarmuka berakhir pencampuran warnanya bersamaan.
     const VIZ_BLEND_MS = 600;
 
@@ -1110,14 +1012,14 @@
         const n = c.length === 3 ? c.split('').map(x => x + x).join('') : c;
         return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)];
     }
-    function readVizColors(name) {
-        // name diberikan -> baca TABEL tema dari probe (target murni, bebas
-        // nilai inline hasil blend UI di <html>); tanpa name -> kondisi terkini
+    function readVizColors(mode, color) {
+        // mode + color diberikan -> baca TABEL kombinasi dari probe (target murni,
+        // bebas nilai inline hasil blend UI di <html>); tanpa argumen -> kondisi terkini
         const cs = getComputedStyle(document.documentElement);
         const accent = cs.getPropertyValue('--accent').trim() || '#58a6ff';
         const sub = cs.getPropertyValue('--text-sub').trim() || '#9ba0a6';
-        if (name) {
-            const t = themeColorTable(name);
+        if (mode && color) {
+            const t = themeColorTable(mode, color);
             return {
                 accent: t['--accent'] || parseHexToken(accent),
                 sub: t['--text-sub'] || parseHexToken(sub)
@@ -1162,9 +1064,10 @@
 
     if (typeof MutationObserver !== 'undefined') {
         new MutationObserver(() => {
-            // target = tabel tema BARU dari probe — bukan computed root, karena
-            // root kini memegang nilai inline hasil blend (kondisi terkini)
-            const next = readVizColors(document.documentElement.getAttribute('data-theme'));
+            // target = tabel kombinasi (mode,warna) BARU dari probe — bukan computed
+            // root, karena root kini memegang nilai inline hasil blend (kondisi terkini)
+            const rootEl = document.documentElement;
+            const next = readVizColors(rootEl.getAttribute('data-mode'), rootEl.getAttribute('data-accent'));
             if (vizReducedMotion.matches) {
                 // prefers-reduced-motion: langsung pakai warna baru, tanpa blend
                 vizBlendFrom = null;
@@ -1179,7 +1082,7 @@
             vizBlendFrom = { accent: vizCur.accent.slice(), sub: vizCur.sub.slice() };
             vizBlendTo = next;
             vizBlendStart = performance.now();
-        }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode', 'data-accent'] });
     }
 
     // ---- cache ukuran kanvas via ResizeObserver (fallback window resize) ----
@@ -1390,18 +1293,23 @@
     }
 
     /* =========================================================
-       THEME — [data-theme] pada <html>, 9 tema, tombol switcher
+       THEME — [data-mode] + [data-accent] pada <html>:
+       3 mode x 8 warna, dua grup tombol switcher
        ========================================================= */
-    const THEME_KEY = 'user-theme';
+    const THEME_KEY_MODE = 'user-theme-mode';
+    const THEME_KEY_COLOR = 'user-theme-color';
+    const THEME_MODES = ['light', 'dark', 'oled'];
+    const THEME_COLORS = ['blue', 'green', 'teal', 'orange', 'red', 'pink', 'violet', 'mono'];
     const themeButtons = document.querySelectorAll('.theme-btn');
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     /* ---- SISTEM BLEND WARNA SELURUH-UI (efek "timpa") ----
-       Saat tema berganti, SEMUA custom property warna diinterpolasi dari
-       kondisi TERKINI (bisa tengah blend tema sebelumnya) menuju tabel warna
-       tema tujuan, berbasis TIMESTAMP (easeOutCubic, 600 ms) — fungsi murni
-       dari (ts - start), hasil identik di 30/60/144 Hz. Klik beruntun
-       secepat apa pun selalu menimpa dari campuran warna saat itu:
-       tidak ada lompatan, tidak ada animasi yang dilewati. */
+       Saat mode dan/atau warna berganti, SEMUA custom property warna
+       diinterpolasi dari kondisi TERKINI (bisa tengah blend sebelumnya)
+       menuju set token LENGKAP kombinasi (mode,warna) tujuan, berbasis
+       TIMESTAMP (easeOutCubic, 600 ms) — fungsi murni dari (ts - start),
+       hasil identik di 30/60/144 Hz. Klik beruntun secepat apa pun selalu
+       menimpa dari campuran warna saat itu: tidak ada lompatan, tidak ada
+       animasi yang dilewati. */
     const THEME_LERP_MS = 600;   // = VIZ_BLEND_MS: UI & visualizer seirama
     const THEME_COLOR_KEYS = [
         '--bg-body', '--bg-panel', '--bg-item', '--bg-item-hover',
@@ -1410,21 +1318,23 @@
         '--buffer-bg', '--viz-bg'
     ];
 
-    // probe tersembunyi: membaca tabel warna tema TANPA terpengaruh nilai
-    // inline hasil blend di <html> (deklarasi kaidenya sendiri menang
-    // atas warisan) — dipasang sebelum interaksi pertama
+    // probe tersembunyi: membaca tabel warna kombinasi (mode,warna) TANPA
+    // terpengaruh nilai inline hasil blend di <html> (deklarasi kaidenya sendiri
+    // menang atas warisan) — dipasang sebelum interaksi pertama
     const THEME_PROBE = document.createElement('div');
     THEME_PROBE.style.display = 'none';
     document.body.appendChild(THEME_PROBE);
 
     function parseThemeColor(v) {
         if (!v) return null;
-        if (v[0] === '#') return parseHexToken(v);        // '#rrggbb'
+        if (v[0] === '#') return parseHexToken(v);        // '#rrggbb' | '#rgb'
         const m = v.match(/\d+(?:\.\d+)?/g);            // 'r, g, b' | 'rgb(...)'
         return (m && m.length >= 3) ? [+m[0], +m[1], +m[2]] : null;
     }
-    function themeColorTable(name) {
-        THEME_PROBE.setAttribute('data-theme', name);
+    function themeColorTable(mode, color) {
+        // probe diberi KEDUA atribut agar selector [data-accent][data-mode] cocok
+        THEME_PROBE.setAttribute('data-mode', mode);
+        THEME_PROBE.setAttribute('data-accent', color);
         const cs = getComputedStyle(THEME_PROBE);
         const out = {};
         for (const k of THEME_COLOR_KEYS) out[k] = parseThemeColor(cs.getPropertyValue(k).trim());
@@ -1451,7 +1361,7 @@
     }
 
     let themeBlendFrom = null;   // titik awal blend = kondisi warna saat tema berganti
-    let themeBlendTo = null;     // tabel warna tema tujuan
+    let themeBlendTo = null;     // tabel warna kombinasi tujuan
     let themeBlendStart = 0;     // timestamp (ms) saat blend dimulai
     let themeBlendRaf = 0;       // 0 = loop rAF tidak sedang berjalan
 
@@ -1483,46 +1393,47 @@
         themeBlendRaf = requestAnimationFrame(themeBlendLoop);
     }
 
+    // sinkronkan DUA grup tombol terpisah: mode (data-set-mode) & warna (data-set-color)
     function syncThemeButtons() {
-        const current = document.documentElement.getAttribute('data-theme');
+        const rootEl = document.documentElement;
+        const curMode = rootEl.getAttribute('data-mode');
+        const curColor = rootEl.getAttribute('data-accent');
         themeButtons.forEach(btn => {
-            const on = btn.dataset.setTheme === current;
+            let on = false;
+            if (btn.dataset.setMode) on = btn.dataset.setMode === curMode;
+            else if (btn.dataset.setColor) on = btn.dataset.setColor === curColor;
             btn.setAttribute('aria-pressed', on ? 'true' : 'false');
             btn.classList.toggle('active', on);
         });
     }
 
-    function storeTheme(name) {
-        try { localStorage.setItem(THEME_KEY, name); } catch (e) { /* storage bisa diblokir */ }
+    function storeTheme(mode, color) {
+        // key lama 'user-theme' sengaja TIDAK disentuh (hanya dibaca script FOUC untuk migrasi)
+        try {
+            localStorage.setItem(THEME_KEY_MODE, mode);
+            localStorage.setItem(THEME_KEY_COLOR, color);
+        } catch (e) { /* storage bisa diblokir */ }
     }
 
-    /* ---- denyut klik ganti tema (tetesan air) ----
-       Dekoratif dan terpisah total dari mesin blend warna: sebuah titik
-       tetesan menyala sekejap di titik klik (efek "plip"), lalu tiga riak
-       hairline melebar makin lemah dan makin pelan — seperti gelombang di
-       permukaan air. Warna = aksen tema TUJUAN. Klik beruntun: denyut lama
-       dibatalkan, denyut baru dari titik klik terbaru (timpa — konsisten
-       dengan perilaku blend warna). */
+    /* ---- denyut klik ganti tema (cincin hairline) ----
+       Dekoratif dan terpisah total dari mesin blend warna: cincin muncul
+       SEIRAMA dimulainya blend, memakai warna aksen kombinasi TUJUAN, lalu
+       mengembang & memudar 600 ms (easeOutCubic — kembar timing blend).
+       Klik beruntun: denyut lama dibatalkan, denyut baru dari titik klik
+       terbaru (timpa — konsisten dengan perilaku blend warna). */
     let themePulseBox = null;
     let themePulseAnims = [];
-    // riak: makin belakangan -> makin kecil, makin redup, makin pelan
-    // (amplitudo gelombang air meredup menjauhi pusat tetesan)
-    const PULSE_RIPPLE_SPEC = [
-        { scaleTo: 1,    o0: 0.30, dur: 800, delay: 60  },
-        { scaleTo: 0.72, o0: 0.19, dur: 760, delay: 200 },
-        { scaleTo: 0.46, o0: 0.11, dur: 700, delay: 340 }
+    const PULSE_RING_SPEC = [
+        { scaleTo: 1,    o0: 0.7,  dur: 600, delay: 0   },
+        { scaleTo: 0.66, o0: 0.45, dur: 520, delay: 120 }
     ];
-    const PULSE_DOT_SPEC = { dur: 340, delay: 0 };
     function fireThemePulse(x, y, target) {
         if (typeof x !== 'number' || typeof y !== 'number') return;  // panggilan programatik
         if (reducedMotionQuery.matches) return;                      // gerak minimal: tanpa denyut
         if (!themePulseBox) {
             themePulseBox = document.createElement('div');
             themePulseBox.id = 'theme-pulse';
-            const dot = document.createElement('div');
-            dot.className = 'pulse-dot';
-            themePulseBox.appendChild(dot);                          // anak pertama = tetesan
-            for (let i = 0; i < PULSE_RIPPLE_SPEC.length; i++) {
+            for (let i = 0; i < 2; i++) {
                 const ring = document.createElement('div');
                 ring.className = 'pulse-ring';
                 themePulseBox.appendChild(ring);
@@ -1535,39 +1446,31 @@
         const rgb = (target && target['--accent']) ? target['--accent'] : null;
         const col = rgb ? 'rgb(' + Math.round(rgb[0]) + ',' + Math.round(rgb[1]) + ',' + Math.round(rgb[2]) + ')' : null;
         for (let i = 0; i < themePulseBox.children.length; i++) {
-            const el = themePulseBox.children[i];
-            const isDot = el.className === 'pulse-dot';
-            const s = isDot ? PULSE_DOT_SPEC : (PULSE_RIPPLE_SPEC[i - 1] || PULSE_RIPPLE_SPEC[0]);
-            if (col) {
-                if (isDot) el.style.backgroundColor = col;   // tetesan: tinta warna aksen
-                else el.style.borderColor = col;             // riak: hairline aksen
-            }
-            if (typeof el.animate !== 'function') continue;  // browser tua: tanpa denyut
-            themePulseAnims.push(isDot
-                ? el.animate(
-                    [   // tetesan: menyala lalu melebur ke permukaan air
-                        { transform: 'scale(0.55)', opacity: 0.55 },
-                        { transform: 'scale(1)',    opacity: 0.18, offset: 0.6 },
-                        { transform: 'scale(1.12)', opacity: 0 }
-                    ],
-                    { duration: s.dur, delay: s.delay, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
-                )
-                : el.animate(
-                    [   // riak: kian melebar, kian redup
-                        { transform: 'scale(0.12)', opacity: s.o0 },
-                        { transform: 'scale(' + s.scaleTo + ')', opacity: 0 }
-                    ],
-                    { duration: s.dur, delay: s.delay, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
-                )
-            );
+            const ring = themePulseBox.children[i];
+            const s = PULSE_RING_SPEC[i] || PULSE_RING_SPEC[0];
+            if (col) ring.style.borderColor = col;
+            if (typeof ring.animate !== 'function') continue;   // browser tua: tanpa denyut
+            themePulseAnims.push(ring.animate(
+                [
+                    { transform: 'scale(0.12)', opacity: s.o0 },
+                    { transform: 'scale(' + s.scaleTo + ')', opacity: 0 }
+                ],
+                { duration: s.dur, delay: s.delay, easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)' }
+            ));
         }
     }
 
-    function applyTheme(name, x, y) {
+    // patch: { mode } | { color } | { mode, color }. Atribut yang tak disebut
+    // tetap memakai nilai kini; lerp SELALU menuju set token LENGKAP kombinasi baru.
+    function applyThemeChange(patch, x, y) {
         const root = document.documentElement;
-        if (root.getAttribute('data-theme') === name) { syncThemeButtons(); return; }
+        const curMode = root.getAttribute('data-mode');
+        const curColor = root.getAttribute('data-accent');
+        const mode = (patch && THEME_MODES.indexOf(patch.mode) >= 0) ? patch.mode : curMode;
+        const color = (patch && THEME_COLORS.indexOf(patch.color) >= 0) ? patch.color : curColor;
+        if (mode === curMode && color === curColor) { syncThemeButtons(); return; }
 
-        const target = themeColorTable(name);
+        const target = themeColorTable(mode, color);
         if (!target || !target['--accent'] || reducedMotionQuery.matches) {
             // prefers-reduced-motion / tema tak terbaca: langsung, tanpa blend
             themeBlendFrom = null;
@@ -1575,13 +1478,14 @@
             if (themeBlendRaf) { cancelAnimationFrame(themeBlendRaf); themeBlendRaf = 0; }
             clearBlendColors();
             root.classList.remove('theme-lerp');
-            root.setAttribute('data-theme', name);
-            storeTheme(name);
+            root.setAttribute('data-mode', mode);
+            root.setAttribute('data-accent', color);
+            storeTheme(mode, color);
             syncThemeButtons();
             return;
         }
 
-        // denyut halus di titik klik — aksen tema TUJUAN; murni dekoratif,
+        // denyut halus di titik klik — aksen kombinasi TUJUAN; murni dekoratif,
         // tidak menyentuh jalur blend warna sama sekali
         fireThemePulse(x, y, target);
 
@@ -1589,8 +1493,9 @@
         // berjalan, nilainya adalah campuran tengah-jalan: tema baru MENIMPA
         // dari situ, bukan melompat (inilah perilaku yang diminta)
         const from = readCurrentColors();
-        root.setAttribute('data-theme', name);   // sumber kebenaran + pemicu observer viz
-        storeTheme(name);
+        root.setAttribute('data-mode', mode);      // sumber kebenaran + pemicu observer viz
+        root.setAttribute('data-accent', color);
+        storeTheme(mode, color);
         syncThemeButtons();
 
         // kunci tampilan pada kondisi terkini SEBELUM paint berikutnya agar
@@ -1608,7 +1513,8 @@
     // workaround penerusan klik era themeVt tidak diperlukan lagi
     themeButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            applyTheme(btn.dataset.setTheme, e.clientX, e.clientY);
+            if (btn.dataset.setMode) applyThemeChange({ mode: btn.dataset.setMode }, e.clientX, e.clientY);
+            else if (btn.dataset.setColor) applyThemeChange({ color: btn.dataset.setColor }, e.clientX, e.clientY);
         });
     });
 
@@ -1671,6 +1577,14 @@
             return songsList[currentTrackIndex];
         }
         return null;
+    }
+
+    // sumber kebenaran baris aktif = IDENTITAS lagu (bukan indeks baris)
+    function isPlayingSong(song) {
+        const cur = getCurrentSong();
+        if (!cur || !song) return false;
+        if (cur.download_url && song.download_url) return cur.download_url === song.download_url;
+        return cur.name === song.name;
     }
 
     function setPlayingState(isPlaying) {
@@ -1771,7 +1685,19 @@
     audioPlayer.addEventListener('pause', () => setPlayingState(false));
     audioPlayer.addEventListener('waiting', () => setLoadingState(true));
     audioPlayer.addEventListener('canplay', () => setLoadingState(false));
-    audioPlayer.addEventListener('playing', () => setLoadingState(false));
+    // satu-satunya handler 'playing': hentikan spinner + segarkan tampilan trek
+    // (membersihkan teks 'playlist finished.' / 'library finished.' saat putar ulang)
+    audioPlayer.addEventListener('playing', () => {
+        setLoadingState(false);
+        const song = getCurrentSong();
+        if (song) {
+            const { title, artist } = parseSongData(song.name);
+            nowPlayingElement.textContent = title;
+            nowPlayingArtistElement.textContent = artist;
+            updateDocumentTitle(title, artist);
+        }
+        statusElement.textContent = '';
+    });
     audioPlayer.addEventListener('timeupdate', updateProgressUI);
     audioPlayer.addEventListener('loadedmetadata', () => { updateProgressUI(); updateBufferedUI(); });
     audioPlayer.addEventListener('progress', updateBufferedUI);
@@ -1867,6 +1793,13 @@
         updateVolumeIconSafe();
     }
     muteBtn.addEventListener('click', toggleMute);
+    // volume default PENUH (tidak ada persistensi volume -> kunjungan pertama selalu 1);
+    // updateVolumeIcon() sengaja dipanggil SEBELUM updateVolumeIconSafe() pertama,
+    // selagi #volume-icon masih terpasang di DOM
+    audioPlayer.volume = 1;
+    volumeSlider.value = '1';
+    lastVolume = 1;
+    updateVolumeIcon();
     updateVolumeIconSafe();
 
     /* ---- global keyboard shortcuts ---- */
@@ -2003,13 +1936,13 @@
         updatePlayerControlsEnabled();
     }
 
+    // penandaan .active baris playlist: HANYA lewat isPlayingSong(song)
     function highlightActiveTrack() {
         const allItems = playlistElement.querySelectorAll('li[data-index]');
-        allItems.forEach(item => item.classList.remove('active'));
-        if (currentTrackIndex >= 0 && currentTrackIndex < songsList.length) {
-            const activeItem = playlistElement.querySelector(`li[data-index="${currentTrackIndex}"]`);
-            if (activeItem) activeItem.classList.add('active');
-        }
+        allItems.forEach(item => {
+            const song = songsList[Number(item.getAttribute('data-index'))];
+            item.classList.toggle('active', isPlayingSong(song));
+        });
     }
 
     function loadTrack(index) {
@@ -2119,8 +2052,8 @@
         nowPlayingElement.innerText = title;
         nowPlayingArtistElement.innerText = artist;
         updateDocumentTitle(title, artist);
-        // clear playlist highlight (playing directly from library, not the playlist queue)
-        document.querySelectorAll('#playlist li[data-index]').forEach(li => li.classList.remove('active'));
+        // baris playlist menyala HANYA bila lagu yang sama memang ada di playlist (identitas lagu)
+        highlightActiveTrack();
         highlightActiveLibraryTrack();
         audioPlayer.play().catch(error => {
             console.log('Autoplay blocked.', error);
@@ -2130,12 +2063,12 @@
         statusElement.style.display = 'none';
     }
 
+    // penandaan .active baris library: HANYA lewat isPlayingSong(song)
     function highlightActiveLibraryTrack() {
-        document.querySelectorAll('#library li[data-lib-index]').forEach(li => li.classList.remove('active'));
-        if (playingLibraryIndex >= 0) {
-            const activeItem = libraryElement.querySelector(`li[data-lib-index="${playingLibraryIndex}"]`);
-            if (activeItem) activeItem.classList.add('active');
-        }
+        document.querySelectorAll('#library li[data-lib-index]').forEach(li => {
+            const song = librarySongs[Number(li.getAttribute('data-lib-index'))];
+            li.classList.toggle('active', isPlayingSong(song));
+        });
     }
 
     function updatePlayerControlsEnabled() {
