@@ -8,7 +8,7 @@
         var KEY_MODE = 'user-theme-mode';
         var KEY_COLOR = 'user-theme-color';
         var MODES = ['light', 'dark', 'oled'];
-        var COLORS = ['blue', 'green', 'teal', 'orange', 'red', 'pink', 'violet', 'mono'];
+        var COLORS = ['blue', 'green', 'teal', 'orange', 'red', 'pink', 'violet', 'yellow', 'lime', 'cyan', 'indigo', 'magenta', 'brown', 'olive', 'slate', 'mono'];
         var MIGRATE = {
             light: ['light', 'blue'], dark: ['dark', 'blue'], oled: ['oled', 'violet'],
             phosphor: ['dark', 'green'], mono: ['light', 'mono'], ember: ['dark', 'orange'],
@@ -80,6 +80,22 @@
         [data-accent="violet"][data-mode="dark"],[data-accent="violet"][data-mode="oled"]{--accent:#a78bfa;--accent-rgb:167,139,250;--on-accent:#150b26;--on-accent-rgb:21,11,38}
         [data-accent="mono"][data-mode="light"]{--accent:#111;--accent-rgb:17,17,17;--on-accent:#fff;--on-accent-rgb:255,255,255}
         [data-accent="mono"][data-mode="dark"],[data-accent="mono"][data-mode="oled"]{--accent:#d4d4d4;--accent-rgb:212,212,212;--on-accent:#111;--on-accent-rgb:17,17,17}
+        [data-accent="yellow"][data-mode="light"]{--accent:#b45309;--accent-rgb:180,83,9;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="yellow"][data-mode="dark"],[data-accent="yellow"][data-mode="oled"]{--accent:#facc15;--accent-rgb:250,204,21;--on-accent:#241d02;--on-accent-rgb:36,29,2}
+        [data-accent="lime"][data-mode="light"]{--accent:#4d7c0f;--accent-rgb:77,124,15;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="lime"][data-mode="dark"],[data-accent="lime"][data-mode="oled"]{--accent:#a3e635;--accent-rgb:163,230,53;--on-accent:#1a2a0d;--on-accent-rgb:26,42,13}
+        [data-accent="cyan"][data-mode="light"]{--accent:#0e7490;--accent-rgb:14,116,144;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="cyan"][data-mode="dark"],[data-accent="cyan"][data-mode="oled"]{--accent:#22d3ee;--accent-rgb:34,211,238;--on-accent:#052030;--on-accent-rgb:5,32,48}
+        [data-accent="indigo"][data-mode="light"]{--accent:#4f46e5;--accent-rgb:79,70,229;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="indigo"][data-mode="dark"],[data-accent="indigo"][data-mode="oled"]{--accent:#818cf8;--accent-rgb:129,140,248;--on-accent:#0f1033;--on-accent-rgb:15,16,51}
+        [data-accent="magenta"][data-mode="light"]{--accent:#a21caf;--accent-rgb:162,28,175;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="magenta"][data-mode="dark"],[data-accent="magenta"][data-mode="oled"]{--accent:#e879f9;--accent-rgb:232,121,249;--on-accent:#26073a;--on-accent-rgb:38,7,58}
+        [data-accent="brown"][data-mode="light"]{--accent:#5d4037;--accent-rgb:93,64,55;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="brown"][data-mode="dark"],[data-accent="brown"][data-mode="oled"]{--accent:#e0a458;--accent-rgb:224,164,88;--on-accent:#241405;--on-accent-rgb:36,20,5}
+        [data-accent="olive"][data-mode="light"]{--accent:#4c5a2a;--accent-rgb:76,90,42;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="olive"][data-mode="dark"],[data-accent="olive"][data-mode="oled"]{--accent:#c0ca33;--accent-rgb:192,202,51;--on-accent:#26290a;--on-accent-rgb:38,41,10}
+        [data-accent="slate"][data-mode="light"]{--accent:#475569;--accent-rgb:71,85,105;--on-accent:#fff;--on-accent-rgb:255,255,255}
+        [data-accent="slate"][data-mode="dark"],[data-accent="slate"][data-mode="oled"]{--accent:#94a3b8;--accent-rgb:148,163,184;--on-accent:#1e293b;--on-accent-rgb:30,41,59}
 
         * { box-sizing: border-box; }
 
@@ -665,6 +681,12 @@
             border-bottom: none;
         }
 
+        /* panel pengaturan (tab "settings") — rumah baru switcher tema */
+        .settings-panel {
+            padding: 18px 4px 6px;
+            animation: item-enter 0.25s ease both;
+        }
+
         /* equalizer mini untuk baris aktif */
         .eq-mini { display: none; align-items: flex-end; gap: 2px; height: 14px; }
         .eq-mini span {
@@ -750,25 +772,6 @@
 
     <header class="head-row">
         <h2>HANTABIRUSSSS</h2>
-        <div class="theme-selector-container" role="group" aria-label="theme">
-            <span aria-hidden="true">mode:</span>
-            <div class="theme-switch" id="mode-switch">
-                <button type="button" class="theme-btn" data-set-mode="light" aria-pressed="false">light</button>
-                <button type="button" class="theme-btn" data-set-mode="dark" aria-pressed="false">dark</button>
-                <button type="button" class="theme-btn" data-set-mode="oled" aria-pressed="false">oled</button>
-            </div>
-            <span aria-hidden="true">color:</span>
-            <div class="theme-switch" id="color-switch">
-                <button type="button" class="theme-btn" data-set-color="blue" aria-pressed="false">blue</button>
-                <button type="button" class="theme-btn" data-set-color="green" aria-pressed="false">green</button>
-                <button type="button" class="theme-btn" data-set-color="teal" aria-pressed="false">teal</button>
-                <button type="button" class="theme-btn" data-set-color="orange" aria-pressed="false">orange</button>
-                <button type="button" class="theme-btn" data-set-color="red" aria-pressed="false">red</button>
-                <button type="button" class="theme-btn" data-set-color="pink" aria-pressed="false">pink</button>
-                <button type="button" class="theme-btn" data-set-color="violet" aria-pressed="false">violet</button>
-                <button type="button" class="theme-btn" data-set-color="mono" aria-pressed="false">mono</button>
-            </div>
-        </div>
     </header>
 
     <div class="section-label" aria-hidden="true"><span class="idx">01</span><span>signal</span></div>
@@ -832,6 +835,7 @@
     <div class="playlist-tabs" role="tablist">
         <button class="playlist-tab active" data-tab="playlist" role="tab" aria-selected="true">playlist · <span id="playlist-count">0</span></button>
         <button class="playlist-tab" data-tab="library" role="tab" aria-selected="false">library · <span id="library-count">0</span></button>
+        <button class="playlist-tab" data-tab="settings" role="tab" aria-selected="false">settings</button>
     </div>
 
     <div class="playlist-toolbar" id="playlist-toolbar">
@@ -845,6 +849,35 @@
     <div id="status" class="status-msg">fetching data from github...</div>
     <ul class="playlist" id="playlist"></ul>
     <ul class="playlist hidden" id="library"></ul>
+    <div class="settings-panel hidden" id="settings-panel">
+        <div class="theme-selector-container" role="group" aria-label="theme">
+            <span aria-hidden="true">mode:</span>
+            <div class="theme-switch" id="mode-switch">
+                <button type="button" class="theme-btn" data-set-mode="light" aria-pressed="false">light</button>
+                <button type="button" class="theme-btn" data-set-mode="dark" aria-pressed="false">dark</button>
+                <button type="button" class="theme-btn" data-set-mode="oled" aria-pressed="false">oled</button>
+            </div>
+            <span aria-hidden="true">color:</span>
+            <div class="theme-switch" id="color-switch">
+                <button type="button" class="theme-btn" data-set-color="blue" aria-pressed="false">blue</button>
+                <button type="button" class="theme-btn" data-set-color="green" aria-pressed="false">green</button>
+                <button type="button" class="theme-btn" data-set-color="teal" aria-pressed="false">teal</button>
+                <button type="button" class="theme-btn" data-set-color="orange" aria-pressed="false">orange</button>
+                <button type="button" class="theme-btn" data-set-color="red" aria-pressed="false">red</button>
+                <button type="button" class="theme-btn" data-set-color="pink" aria-pressed="false">pink</button>
+                <button type="button" class="theme-btn" data-set-color="violet" aria-pressed="false">violet</button>
+                <button type="button" class="theme-btn" data-set-color="yellow" aria-pressed="false">yellow</button>
+                <button type="button" class="theme-btn" data-set-color="lime" aria-pressed="false">lime</button>
+                <button type="button" class="theme-btn" data-set-color="cyan" aria-pressed="false">cyan</button>
+                <button type="button" class="theme-btn" data-set-color="indigo" aria-pressed="false">indigo</button>
+                <button type="button" class="theme-btn" data-set-color="magenta" aria-pressed="false">magenta</button>
+                <button type="button" class="theme-btn" data-set-color="brown" aria-pressed="false">brown</button>
+                <button type="button" class="theme-btn" data-set-color="olive" aria-pressed="false">olive</button>
+                <button type="button" class="theme-btn" data-set-color="slate" aria-pressed="false">slate</button>
+                <button type="button" class="theme-btn" data-set-color="mono" aria-pressed="false">mono</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -920,6 +953,7 @@
     const clearBtn = document.getElementById('clear-btn');
     const resetBtn = document.getElementById('reset-btn');
     const playlistTabs = document.querySelectorAll('.playlist-tab');
+    const settingsPanel = document.getElementById('settings-panel');
 
     /* =========================================================
        AUDIO VISUALIZER (Web Audio API + Canvas)
@@ -1299,7 +1333,7 @@
     const THEME_KEY_MODE = 'user-theme-mode';
     const THEME_KEY_COLOR = 'user-theme-color';
     const THEME_MODES = ['light', 'dark', 'oled'];
-    const THEME_COLORS = ['blue', 'green', 'teal', 'orange', 'red', 'pink', 'violet', 'mono'];
+    const THEME_COLORS = ['blue', 'green', 'teal', 'orange', 'red', 'pink', 'violet', 'yellow', 'lime', 'cyan', 'indigo', 'magenta', 'brown', 'olive', 'slate', 'mono'];
     const themeButtons = document.querySelectorAll('.theme-btn');
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     /* ---- SISTEM BLEND WARNA SELURUH-UI (efek "timpa") ----
@@ -1869,6 +1903,7 @@
             renderLibrary();
             updateCounts();
             if (songsList.length) loadTrack(0);
+            restoreSavedPlayback();
         } catch (error) {
             statusElement.innerText = 'Error: ' + error.message;
             console.error(error);
@@ -2184,6 +2219,7 @@
         libraryElement.classList.toggle('hidden', tab !== 'library');
         playlistToolbar.classList.toggle('hidden', tab !== 'playlist');
         libraryToolbar.classList.toggle('hidden', tab !== 'library');
+        settingsPanel.classList.toggle('hidden', tab !== 'settings');
     }
 
     playlistTabs.forEach(tab => {
@@ -2319,6 +2355,107 @@
             requestWakeLock();
         }
     });
+
+    /* =========================================================
+       PLAYBACK RESUME — simpan lagu terakhir + posisi detiknya
+       Modul terpisah; TIDAK mengubah main logic. Semua hook adalah
+       listener BARU (banyak listener per event diizinkan browser),
+       plus SATU baris restoreSavedPlayback() di fetchMusicFiles.
+       ========================================================= */
+    const PLAYBACK_KEY = 'hantavirus-playback';
+    const PLAYBACK_SAVE_MS = 3000;   // jeda minimal antar simpan otomatis
+    let pendingSeekSec = null;       // posisi (detik) menunggu loadedmetadata
+    let lastPlaybackSaveMs = 0;      // throttle: timestamp simpan terakhir
+
+    function readSavedPlayback() {
+        try {
+            const raw = localStorage.getItem(PLAYBACK_KEY);
+            if (!raw) return null;
+            const obj = JSON.parse(raw);
+            if (!obj || typeof obj.u !== 'string') return null;
+            const t = Math.floor(Number(obj.t));
+            return { u: obj.u, t: (isFinite(t) && t > 0) ? t : 0, c: obj.c === 'library' ? 'library' : 'playlist' };
+        } catch (e) { return null; }
+    }
+    function savePlaybackNow() {
+        if (!audioPlayer.src || !audioPlayer.src.startsWith('http')) return;
+        if (!isFinite(audioPlayer.currentTime) || audioPlayer.currentTime < 0) return;
+        try {
+            localStorage.setItem(PLAYBACK_KEY, JSON.stringify({
+                u: audioPlayer.src,
+                t: Math.floor(audioPlayer.currentTime),
+                c: playingLibraryIndex >= 0 ? 'library' : 'playlist'
+            }));
+        } catch (e) { /* storage bisa diblokir */ }
+        lastPlaybackSaveMs = performance.now();
+    }
+    function clearSavedPlayback() {
+        try { localStorage.removeItem(PLAYBACK_KEY); } catch (e) { /* ignore */ }
+    }
+
+    // simpan otomatis saat memutar — paling sering tiap 3 detik
+    audioPlayer.addEventListener('timeupdate', () => {
+        if (performance.now() - lastPlaybackSaveMs < PLAYBACK_SAVE_MS) return;
+        if (audioPlayer.paused || audioPlayer.ended) return;
+        savePlaybackNow();
+    });
+    // posisi persis saat jeda / setelah seek manual
+    audioPlayer.addEventListener('pause', savePlaybackNow);
+    audioPlayer.addEventListener('seeked', () => {
+        if (audioPlayer.src) savePlaybackNow();
+    });
+    // trek baru mulai berbunyi: simpan sekali (t ~ 0), menimpa simpanan lama
+    audioPlayer.addEventListener('playing', savePlaybackNow);
+    // tab ditutup / disembunyikan: simpan terakhir kali (posisi persis)
+    window.addEventListener('pagehide', savePlaybackNow);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') savePlaybackNow();
+    });
+    // metadata siap: lompat ke posisi tersimpan, lalu segarkan UI progres
+    audioPlayer.addEventListener('loadedmetadata', () => {
+        if (pendingSeekSec === null) return;
+        const seekTo = pendingSeekSec;
+        pendingSeekSec = null;
+        if (!isFinite(audioPlayer.duration)) return;
+        // posisi tinggal <= 2 detik dari ujung dianggap selesai: mulai dari 0
+        const safe = (seekTo >= audioPlayer.duration - 2)
+            ? 0
+            : Math.min(seekTo, Math.max(0, audioPlayer.duration - 1));
+        audioPlayer.currentTime = safe;
+        updateProgressUI();
+        updateBufferedUI();
+    });
+
+    // konteks library: cermin playFromLibrary TANPA .play() — duplikasi
+    // ringkas ini SENGAJA; jangan memfaktorkan ulang playFromLibrary.
+    function restoreInLibraryMode(libIdx) {
+        playingLibraryIndex = libIdx;
+        const song = librarySongs[libIdx];
+        audioPlayer.src = song.download_url;
+        const { title, artist } = parseSongData(song.name);
+        nowPlayingElement.innerText = title;
+        nowPlayingArtistElement.innerText = artist;
+        updateDocumentTitle(title, artist);
+        highlightActiveTrack();
+        highlightActiveLibraryTrack();
+    }
+    // Pulihkan: dipanggil SATU kali dari fetchMusicFiles setelah katalog siap.
+    // TIDAK memutar otomatis (kebijakan autoplay browser + kendali pengguna):
+    // lagu dipasang pada posisi tersimpan; tombol play/space melanjutkan.
+    function restoreSavedPlayback() {
+        const saved = readSavedPlayback();
+        if (!saved) return;
+        const libIdx = librarySongs.findIndex(s => s.download_url === saved.u);
+        if (libIdx < 0) { clearSavedPlayback(); return; }   // lagu sudah tak ada di repo
+        if (saved.c === 'library') {
+            restoreInLibraryMode(libIdx);
+        } else {
+            const plIdx = songsList.findIndex(s => s.download_url === saved.u);
+            if (plIdx >= 0) { currentTrackIndex = plIdx; loadTrack(plIdx); }
+            else restoreInLibraryMode(libIdx);   // sudah dihapus dari playlist -> lewat katalog
+        }
+        pendingSeekSec = saved.t > 0 ? saved.t : null;
+    }
 
     // init
     fetchMusicFiles();
